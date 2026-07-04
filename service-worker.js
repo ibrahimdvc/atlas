@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atlas-v3-cache-4';
+const CACHE_NAME = 'atlas-v3-cache-5';
 const ASSETS = [
   './',
   './index.html',
@@ -11,15 +11,7 @@ const ASSETS = [
   './sesler/magnific_poddle-kopek-kosma-sesi-p_rlQ0kn5xtc.mp3',
   './atlas_sprite_8_portre.png',
   './atlas_icon_192.png',
-  './atlas_icon_512.png',
-  './normal duruş.mp4',
-  './oyun isteme.mp4',
-  './su-icme.mp4',
-  './pati hareketi.mp4',
-  './mama-yeme.mp4',
-  './sevme.mp4',
-  './kosma.mp4',
-  './uyuma.mp4'
+  './atlas_icon_512.png'
 ];
 
 self.addEventListener('install', event => {

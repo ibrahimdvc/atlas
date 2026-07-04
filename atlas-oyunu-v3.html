@@ -89,6 +89,32 @@
     .act { flex-basis:64px; }
     #bubble { max-width:58%; font-size:13px; }
   }
+  @media (max-width:430px) {
+    #topbar { top:calc(7px + env(safe-area-inset-top)); padding:0 8px; }
+    .tag { border-radius:15px; padding:5px 13px 4px; }
+    .tag .nm { font-size:18px; }
+    .tag .lv { font-size:10px; }
+    .bank { border-radius:15px; padding:6px 12px; font-size:15px; }
+    .needs { top:calc(74px + env(safe-area-inset-top)); gap:7px; }
+    .needs.left { left:5px; }
+    .needs.right { right:5px; }
+    .need { width:50px; border-radius:13px; padding:5px 4px; }
+    .need .ico { font-size:17px; }
+    .need .lbl { font-size:8px; }
+    .bar { height:6px; }
+    #bubble { top:calc(80px + env(safe-area-inset-top)); max-width:54%; padding:6px 12px; font-size:12px; }
+    #dogWrap { width:min(76vw,300px); bottom:108px; }
+    #actions { bottom:calc(8px + env(safe-area-inset-bottom)); gap:5px; padding:0 5px; }
+    .act { flex:1 1 0; max-width:68px; min-width:0; border-radius:15px; padding:6px 2px 5px; }
+    .act .i { font-size:21px; }
+    .act .t { font-size:9px; line-height:1.05; overflow-wrap:anywhere; }
+    #toast { bottom:84px; font-size:12px; padding:8px 14px; }
+    #splash canvas { width:min(72vw,270px); height:min(56vw,230px); }
+    #splash h1 { font-size:44px; letter-spacing:2px; }
+    #splash p { max-width:82vw; text-align:center; font-size:13px; margin-bottom:18px; }
+    #startBtn { font-size:18px; padding:12px 28px; }
+    #installTip { bottom:calc(70px + env(safe-area-inset-bottom)); width:min(92vw,360px); }
+  }
   @media (orientation:landscape) and (max-height:520px) {
     #topbar { top:calc(6px + env(safe-area-inset-top)); padding:0 8px; }
     .tag { border-radius:14px; padding:4px 12px 3px; }
@@ -171,6 +197,7 @@ const VIDEO_FILES = {
   run:'kosma.mp4',
   sleep:'uyuma.mp4'
 };
+const VIDEO_PRELOAD_ORDER = ['paw','eat','drink','pet','run','play','sleep'];
 const SFX_FILE = 'atlas_sfx_pack.mp3';
 const SFX = {
   paw:{src:SFX_FILE,start:.15,duration:.75,volume:.35},
@@ -186,8 +213,27 @@ const videos = {};
 const bank = $('videoBank');
 for (const [key, src] of Object.entries(VIDEO_FILES)) {
   const v = document.createElement('video');
-  v.src = src; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+  v.dataset.src = src;
+  v.muted = true; v.loop = true; v.playsInline = true; v.preload = key === 'idle' ? 'auto' : 'none';
+  if (key === 'idle') v.src = src;
   bank.appendChild(v); videos[key] = v;
+}
+function ensureVideo(key, eager=false) {
+  const v = videos[key];
+  if (!v) return null;
+  if (!v.src) {
+    v.src = v.dataset.src;
+    v.preload = eager ? 'auto' : 'metadata';
+    v.load();
+  }
+  return v;
+}
+function warmVideosSlowly() {
+  let delay = 650;
+  VIDEO_PRELOAD_ORDER.forEach(key => {
+    setTimeout(() => ensureVideo(key, true), delay);
+    delay += 850;
+  });
 }
 
 const cvs = $('dogCanvas'), ctx = cvs.getContext('2d', { willReadFrequently:true });
@@ -244,7 +290,7 @@ function setClip(next, face) {
   const prev = videos[clip];
   if (prev) prev.pause();
   clip = next;
-  const v = videos[clip];
+  const v = ensureVideo(clip, true);
   if (v) {
     v.currentTime = 0;
     if (started) v.play().catch(()=>{});
@@ -498,10 +544,12 @@ $('startBtn').onclick=async()=>{
   action=null; movingCb=null; dogX=0; targetX=0; facing=1;
   stopAllVideos();
   clip='idle';
+  ensureVideo(clip, true);
   await videos[clip].play().catch(()=>{});
+  warmVideosSlowly();
   const s=$('splash'); s.style.opacity=0; setTimeout(()=>s.remove(),650); setBubble('mutlu');
 };
-setClip('idle'); updateHUD(); requestAnimationFrame(tick);
+ensureVideo('idle', true); setClip('idle'); updateHUD(); requestAnimationFrame(tick);
 </script>
 </body>
 </html>
