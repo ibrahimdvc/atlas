@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Atlas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Atlas ile mobil sanal evcil hayvan oyunu.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="atlas_icon_192.png">
+<title>ATLAS v3 - Gerçek Hareket</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif; background:#fff; }
+  #scene { position:fixed; inset:0; overflow:hidden; background:#fff; }
+  #sun { position:absolute; right:8vw; top:7vh; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,#fff8d5 0%,#ffe49d 45%,transparent 72%); }
+  .cloud { position:absolute; width:88px; height:28px; border-radius:40px; background:#fff; opacity:.82; animation:cloud 70s linear infinite; }
+  .cloud:before,.cloud:after { content:""; position:absolute; border-radius:50%; background:#fff; }
+  .cloud:before { width:38px; height:38px; left:14px; top:-18px; }
+  .cloud:after { width:28px; height:28px; left:48px; top:-12px; }
+  .c1 { top:10vh; animation-delay:-20s; }
+  .c2 { top:20vh; transform:scale(.75); animation-duration:95s; animation-delay:-55s; }
+  @keyframes cloud { from{ left:-130px } to{ left:110vw } }
+  #sun,.cloud,#floorGlow { display:none; }
+
+  #dogShadow { display:none; }
+  #dogWrap { position:absolute; left:50%; bottom:16%; width:min(62vw,430px); aspect-ratio:960/760; transform:translateX(-50%); will-change:transform; }
+  #dogCanvas { position:absolute; inset:0; width:100%; height:100%; }
+  #petHit { position:absolute; inset:-5% -8%; }
+  #videoBank { position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; }
+
+  .prop { position:absolute; bottom:15%; opacity:0; pointer-events:none; transform:scale(.45); transition:opacity .25s, transform .25s; }
+  .prop.on { opacity:1; transform:scale(1); }
+  #ball { width:36px; height:36px; border-radius:50%; background:#ffb22e; }
+  #tree { right:5%; bottom:13%; font-size:108px; }
+  .bowl { width:86px; height:44px; }
+  .bowl:before { content:""; position:absolute; left:0; bottom:0; width:86px; height:34px; border-radius:8px 8px 22px 22px; }
+  .bowl:after { content:""; position:absolute; left:7px; bottom:24px; width:72px; height:18px; border-radius:50%; }
+  #food { right:8%; }
+  #water { left:8%; }
+  #food,#water,#tree { display:none; }
+  #food:before { background:linear-gradient(#ff8a65,#df4918); }
+  #food:after { background:radial-gradient(ellipse,#895322 30%,#5d3517 100%); }
+  #water:before { background:linear-gradient(#64b5f6,#1976d2); }
+  #water:after { background:radial-gradient(ellipse,#d4f1ff 20%,#76c5f9 100%); }
+
+  #topbar { position:fixed; top:calc(10px + env(safe-area-inset-top)); left:0; right:0; z-index:10; display:flex; justify-content:space-between; align-items:flex-start; padding:0 12px; pointer-events:none; }
+  .tag,.bank,.need,#bubble { background:rgba(255,255,255,.9); box-shadow:0 3px 10px rgba(0,0,0,.12); }
+  .tag { border-radius:20px; padding:6px 18px 5px; text-align:center; }
+  .tag .nm { color:#584434; font-size:22px; font-weight:800; line-height:1; }
+  .tag .lv { color:#bf8643; font-size:12px; font-weight:800; }
+  .bank { border-radius:20px; padding:8px 16px; color:#584434; font-size:18px; font-weight:800; }
+  .needs { position:fixed; top:calc(88px + env(safe-area-inset-top)); z-index:10; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+  .needs.left { left:10px; } .needs.right { right:10px; }
+  .need { width:64px; border-radius:16px; padding:6px 5px 7px; text-align:center; }
+  .need .ico { font-size:22px; line-height:1.1; }
+  .need .lbl { color:#745d49; font-size:10px; font-weight:800; line-height:1.15; }
+  .bar { height:8px; margin-top:3px; border-radius:6px; background:#e9e0d2; overflow:hidden; }
+  .fill { height:100%; width:80%; border-radius:6px; transition:width .35s, background .35s; }
+  .low { animation:warn 1s infinite; }
+  @keyframes warn { 50%{ box-shadow:0 0 0 4px rgba(255,80,80,.42) } }
+  #bubble { position:fixed; left:50%; top:calc(92px + env(safe-area-inset-top)); z-index:9; transform:translateX(-50%); max-width:62%; border-radius:18px; padding:8px 18px; color:#594838; font-size:15px; font-weight:800; text-align:center; }
+  #bubble:after { content:""; position:absolute; left:50%; bottom:-8px; transform:translateX(-50%); border:9px solid transparent; border-top-color:rgba(255,255,255,.9); border-bottom:0; }
+  #actions { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:10; display:flex; justify-content:center; gap:10px; padding:0 10px; }
+  .act { flex:0 1 76px; border:0; border-radius:20px; padding:9px 4px 7px; background:rgba(255,255,255,.93); box-shadow:0 4px 0 rgba(180,150,110,.56),0 8px 16px rgba(0,0,0,.15); font-family:inherit; cursor:pointer; }
+  .act:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(180,150,110,.56); }
+  .act .i { display:block; font-size:26px; line-height:1.15; }
+  .act .t { color:#6b563f; font-size:11px; font-weight:800; }
+  #toast { position:fixed; left:50%; bottom:120px; z-index:20; transform:translateX(-50%); opacity:0; pointer-events:none; border-radius:22px; padding:10px 22px; background:rgba(60,45,30,.86); color:white; font-size:15px; font-weight:800; transition:opacity .25s; }
+  .fx,.floatpt { position:fixed; z-index:20; pointer-events:none; text-shadow:0 2px 4px rgba(0,0,0,.2); animation:rise 1.35s forwards; }
+  .fx { font-size:26px; } .floatpt { color:#ff8c1a; font-size:22px; font-weight:900; }
+  @keyframes rise { 0%{opacity:0; transform:translateY(0) scale(.6)} 18%{opacity:1; transform:translateY(-12px) scale(1.1)} 100%{opacity:0; transform:translateY(-82px) scale(.95)} }
+  #night { display:none; }
+  #splash { position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; transition:opacity .6s; }
+  #splash canvas { width:min(58vw,330px); height:min(52vw,300px); }
+  #splash h1 { margin-top:8px; color:#584434; font-size:60px; font-weight:900; letter-spacing:4px; text-shadow:0 3px 0 rgba(232,134,44,.35); }
+  #splash p { color:#6b563f; font-size:16px; font-weight:800; margin:4px 0 26px; }
+  #startBtn { border:0; border-radius:40px; padding:15px 50px; background:linear-gradient(#ffb03a,#ff8c1a); box-shadow:0 6px 0 #d96e00,0 12px 24px rgba(217,110,0,.35); color:white; font-family:inherit; font-size:23px; font-weight:900; cursor:pointer; }
+  #installTip { position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom)); z-index:45; width:min(92vw,430px);
+    transform:translate(-50%,18px); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+    border:1px solid rgba(90,68,52,.12); border-radius:18px; padding:12px 44px 12px 14px;
+    background:rgba(255,255,255,.96); box-shadow:0 8px 26px rgba(0,0,0,.16); color:#594838; font-size:13px; font-weight:750; line-height:1.25; }
+  #installTip.on { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+  #installTip button { position:absolute; right:8px; top:8px; width:28px; height:28px; border:0; border-radius:50%; background:#f1eadf; color:#594838; font-size:16px; font-weight:900; cursor:pointer; }
+  @media (max-width:560px){
+    #dogWrap { width:70vw; bottom:17%; }
+    .act { flex-basis:64px; }
+    #bubble { max-width:58%; font-size:13px; }
+  }
+  @media (orientation:landscape) and (max-height:520px) {
+    #topbar { top:calc(6px + env(safe-area-inset-top)); padding:0 8px; }
+    .tag { border-radius:14px; padding:4px 12px 3px; }
+    .tag .nm { font-size:17px; }
+    .tag .lv { font-size:10px; }
+    .bank { border-radius:14px; padding:5px 11px; font-size:15px; }
+    #bubble { top:calc(46px + env(safe-area-inset-top)); max-width:44%; border-radius:14px; padding:5px 12px; font-size:12px; }
+    #bubble:after { bottom:-6px; border-width:7px; border-bottom:0; }
+    .needs { top:calc(50px + env(safe-area-inset-top)); gap:6px; }
+    .needs.left { left:6px; }
+    .needs.right { right:6px; }
+    .need { width:52px; border-radius:12px; padding:4px 4px 5px; }
+    .need .ico { font-size:16px; }
+    .need .lbl { font-size:8px; }
+    .bar { height:6px; margin-top:2px; }
+    #dogWrap { width:min(44vw,330px); bottom:58px; }
+    #actions { bottom:calc(6px + env(safe-area-inset-bottom)); gap:6px; padding:0 70px; }
+    .act { flex:0 1 58px; border-radius:14px; padding:5px 3px 4px; box-shadow:0 2px 0 rgba(180,150,110,.45),0 5px 10px rgba(0,0,0,.12); }
+    .act .i { font-size:20px; }
+    .act .t { font-size:9px; line-height:1.05; }
+    #toast { bottom:64px; font-size:12px; padding:7px 14px; }
+    #splash canvas { width:min(34vw,210px); height:min(44vh,190px); }
+    #splash h1 { font-size:38px; margin-top:0; }
+    #splash p { font-size:12px; margin:2px 0 12px; }
+    #startBtn { font-size:16px; padding:9px 28px; box-shadow:0 4px 0 #d96e00,0 8px 18px rgba(217,110,0,.28); }
+    #installTip { top:48px; bottom:auto; width:min(78vw,420px); padding:8px 38px 8px 12px; font-size:11px; border-radius:14px; }
+    #installTip button { top:5px; right:6px; width:24px; height:24px; font-size:14px; }
+  }
+</style>
+</head>
+<body>
+<div id="scene">
+  <div id="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div><div id="floorGlow"></div>
+  <div class="prop bowl" id="food"></div><div class="prop bowl" id="water"></div><div class="prop" id="ball"></div><div class="prop" id="tree">🌳</div>
+  <div id="dogShadow"></div>
+  <div id="dogWrap"><canvas id="dogCanvas" width="960" height="760"></canvas><div id="petHit"></div></div>
+</div>
+<div id="night"></div>
+<div id="videoBank"></div>
+
+<div id="splash">
+  <canvas id="splashCanvas" width="960" height="760"></canvas>
+  <h1>ATLAS</h1><p>Gerçek hareketlerle oyunda seni bekliyor!</p>
+  <button id="startBtn">▶ Oyuna Başla</button>
+</div>
+
+<div id="installTip"><button id="installClose" aria-label="Kapat">×</button><span id="installText"></span></div>
+
+<div id="topbar"><div class="tag"><div class="nm">ATLAS</div><div class="lv" id="bondLv">Bağ Sv. 1</div></div><div class="bank">🐾 <span id="paws">0</span></div></div>
+<div id="bubble">Merhaba!</div>
+<div class="needs left">
+  <div class="need" id="n-yemek"><div class="ico">🍖</div><div class="lbl">Yemek</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-su"><div class="ico">💧</div><div class="lbl">Su</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-enerji"><div class="ico">⚡</div><div class="lbl">Enerji</div><div class="bar"><div class="fill"></div></div></div>
+</div>
+<div class="needs right">
+  <div class="need" id="n-oyun"><div class="ico">🎾</div><div class="lbl">Oyun</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-tuvalet"><div class="ico">🌳</div><div class="lbl">Tuvalet</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-sevgi"><div class="ico">💖</div><div class="lbl">Sevgi</div><div class="bar"><div class="fill"></div></div></div>
+</div>
+<div id="actions">
+  <button class="act" id="btnYemek"><span class="i">🍖</span><span class="t">Besle</span></button>
+  <button class="act" id="btnSu"><span class="i">💧</span><span class="t">Su Ver</span></button>
+  <button class="act" id="btnOyun"><span class="i">🎾</span><span class="t">Top At</span></button>
+  <button class="act" id="btnTuvalet"><span class="i">🌳</span><span class="t">Yürüyüş</span></button>
+  <button class="act" id="btnUyku"><span class="i">💤</span><span class="t">Uyu</span></button>
+</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const VIDEO_FILES = {
+  idle:'normal duruş.mp4',
+  play:'oyun isteme.mp4',
+  drink:'su-icme.mp4',
+  paw:'pati hareketi.mp4',
+  eat:'mama-yeme.mp4',
+  pet:'sevme.mp4',
+  run:'kosma.mp4',
+  sleep:'uyuma.mp4'
+};
+const SFX_FILE = 'atlas_sfx_pack.mp3';
+const SFX = {
+  paw:{src:SFX_FILE,start:.15,duration:.75,volume:.35},
+  bark:{src:SFX_FILE,start:1.55,duration:.85,volume:.42},
+  reward:{src:SFX_FILE,start:6.25,duration:1.2,volume:.42},
+  sleep:{src:SFX_FILE,start:8.05,duration:1.35,volume:.34},
+  eat:{src:'sesler/magnific_kopek-mama-yeme-sesi_nT65AzhYQD.mp3',volume:.48},
+  drink:{src:'sesler/magnific_kopek-su-icme-sesi_mCpPIq8hJQ.mp3',volume:.46},
+  run:{src:'sesler/magnific_poddle-kopek-kosma-sesi-p_rlQ0kn5xtc.mp3',volume:.34},
+  toilet:{src:'sesler/magnific_poddle-kopek-cis-yapma-se_62wC2poiJO.mp3',volume:.4}
+};
+const videos = {};
+const bank = $('videoBank');
+for (const [key, src] of Object.entries(VIDEO_FILES)) {
+  const v = document.createElement('video');
+  v.src = src; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+  bank.appendChild(v); videos[key] = v;
+}
+
+const cvs = $('dogCanvas'), ctx = cvs.getContext('2d', { willReadFrequently:true });
+const splashCvs = $('splashCanvas'), splashCtx = splashCvs.getContext('2d', { willReadFrequently:true });
+const petHit = $('petHit');
+const work = document.createElement('canvas'), wctx = work.getContext('2d', { willReadFrequently:true });
+work.width = cvs.width; work.height = cvs.height;
+let clip = 'idle', facing = 1, started = false;
+let sfxReady=false;
+const sfxPools = Object.fromEntries(Object.entries(SFX).map(([name,cue]) => [name, {
+  index:0,
+  items:Array.from({length:2}, () => {
+    const a = new Audio(cue.src);
+    a.preload = 'auto';
+    a.playsInline = true;
+    return a;
+  })
+}]));
+
+async function unlockSfx(){
+  if (sfxReady) return;
+  const allPlayers = Object.values(sfxPools).flatMap(pool => pool.items);
+  await Promise.all(allPlayers.map(async a => {
+    try {
+      a.volume = 0;
+      await a.play();
+      a.pause();
+      a.currentTime = 0;
+    } catch(e) {}
+  }));
+  sfxReady = true;
+}
+function playSfx(name){
+  if (!sfxReady || !SFX[name]) return;
+  const cue = SFX[name];
+  const pool = sfxPools[name];
+  const a = pool.items[pool.index++ % pool.items.length];
+  a.pause();
+  a.currentTime = cue.start || 0;
+  a.volume = cue.volume;
+  a.play().catch(()=>{});
+  clearTimeout(a._stopTimer);
+  if (cue.duration) {
+    a._stopTimer = setTimeout(() => {
+      a.pause();
+      a.currentTime = 0;
+    }, cue.duration * 1000);
+  }
+}
+
+function setClip(next, face) {
+  if (face) facing = face;
+  if (clip === next) return;
+  const prev = videos[clip];
+  if (prev) prev.pause();
+  clip = next;
+  const v = videos[clip];
+  if (v) {
+    v.currentTime = 0;
+    if (started) v.play().catch(()=>{});
+  }
+}
+function stopAllVideos() {
+  Object.values(videos).forEach(v => {
+    v.pause();
+    v.currentTime = 0;
+  });
+}
+function softCleanStudioWhite(img) {
+  const d = img.data;
+  for (let i=0; i<d.length; i+=4) {
+    const r=d[i], g=d[i+1], b=d[i+2];
+    const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    const spread=max-min;
+    const brightness=(r+g+b)/3;
+    if (brightness < 204 || spread > 34) continue;
+
+    const whiten = Math.min(1, Math.max(0, (brightness - 204) / 40));
+    d[i] = r + (255-r) * whiten;
+    d[i+1] = g + (255-g) * whiten;
+    d[i+2] = b + (255-b) * whiten;
+
+    if (brightness > 224 && spread < 24) {
+      const fade = Math.min(1, Math.max(0, (brightness - 224) / 24));
+      d[i+3] = d[i+3] * (1 - fade * .82);
+    }
+  }
+  return img;
+}
+function drawDog(targetCtx, targetCanvas) {
+  const v = videos[clip] || videos.idle;
+  targetCtx.fillStyle = '#fff';
+  targetCtx.fillRect(0,0,targetCanvas.width,targetCanvas.height);
+  if (!v.videoWidth) return;
+  wctx.clearRect(0,0,work.width,work.height);
+  const scale = Math.min(work.width / v.videoWidth, work.height / v.videoHeight);
+  const dw = Math.round(v.videoWidth * scale);
+  const dh = Math.round(v.videoHeight * scale);
+  const dx = (work.width - dw)/2, dy = work.height - dh + 10;
+  wctx.save();
+  if (facing < 0) { wctx.translate(work.width,0); wctx.scale(-1,1); wctx.drawImage(v, work.width-dx-dw, dy, dw, dh); }
+  else wctx.drawImage(v, dx, dy, dw, dh);
+  wctx.restore();
+  const cleaned = wctx.getImageData(0,0,work.width,work.height);
+  wctx.putImageData(softCleanStudioWhite(cleaned),0,0);
+  targetCtx.drawImage(work,0,0,targetCanvas.width,targetCanvas.height);
+}
+
+const needs = { yemek:78, su:74, enerji:82, oyun:55, tuvalet:70, sevgi:62 };
+const DECAY = { yemek:.32, su:.42, enerji:.22, oyun:.5, tuvalet:.38, sevgi:.3 };
+let paws=0, bondXP=0, bondLevel=1, mood='mutlu', action=null, sleeping=false;
+let dogX=0, targetX=0, movingCb=null, t=0, actionTimer=0;
+const dogWrap=$('dogWrap'), shadow=$('dogShadow'), bubble=$('bubble'), toastEl=$('toast');
+const installTip=$('installTip'), installText=$('installText'), installClose=$('installClose');
+let installPromptEvent=null;
+const FILLC = v => v>55 ? '#6fd66f' : v>28 ? '#ffc14d' : '#ff6b6b';
+function updateHUD(){
+  for (const k in needs){ const el=$('n-'+k), v=Math.round(needs[k]), f=el.querySelector('.fill'); f.style.width=v+'%'; f.style.background=FILLC(v); el.classList.toggle('low',v<28); }
+  $('paws').textContent=paws; $('bondLv').textContent='Bağ Sv. '+bondLevel;
+}
+let toastTimer;
+function toast(m){ toastEl.textContent=m; toastEl.style.opacity=1; clearTimeout(toastTimer); toastTimer=setTimeout(()=>toastEl.style.opacity=0,2200); }
+function fx(ch,x,y,cls='fx'){ const d=document.createElement('div'); d.className=cls; d.textContent=ch; d.style.left=x+'px'; d.style.top=y+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),1400); }
+function earnPaws(n,x=innerWidth/2-30,y=innerHeight*.4){ paws+=n; bondXP+=n; playSfx('reward'); if(bondXP>=bondLevel*100){bondXP=0; bondLevel++; toast('Bağ seviyesi arttı! Sv.'+bondLevel);} fx('+'+n+' 🐾',x,y,'floatpt'); }
+function dogScreenPos(){ const r=dogWrap.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height*.25}; }
+const TEXT = {
+  mutlu:['Bugün harika!','Seni görünce çok mutlu oldum!','Hav hav!'],
+  oyunIstiyor:['Hadi oynayalım!','Topu at!','Zıplamaya hazırım!'],
+  acikti:['Karnım acıktı...','Mama kokusu mu aldım?'],
+  susadi:['Biraz su lütfen?','Dilim kurudu...'],
+  yorgun:['Uykum var...','Biraz dinlenmeliyim.'],
+  tuvaleti:['Yürüyüşe çıkalım mı?','Dışarı çıkmam lazım!'],
+  ilgiIstiyor:['Beni biraz sever misin?','Buradayım!'],
+  uyuyor:['Zzz...'], ye:['Nam nam nam!'], ic:['Su çok iyi geldi!'], top:['Topu kaptım!'], yuruyus:['Ohh, rahatladım!'], sevil:['Bu çok güzel...']
+};
+let lastBubble='';
+function setBubble(k){ if(k===lastBubble) return; lastBubble=k; const a=TEXT[k]||TEXT.mutlu; bubble.textContent=a[Math.floor(Math.random()*a.length)]; }
+function pickMood(){
+  if (sleeping) return 'uyuyor';
+  const map={yemek:'acikti',su:'susadi',enerji:'yorgun',oyun:'oyunIstiyor',tuvalet:'tuvaleti',sevgi:'ilgiIstiyor'};
+  let worst=null, wv=42; for(const k in needs) if(needs[k]<wv){wv=needs[k]; worst=k;}
+  return worst ? map[worst] : 'mutlu';
+}
+function hasUrgentNeed(){
+  return Object.values(needs).some(v => v < 42);
+}
+function applyMoodVisual(){
+  const m = action || (petting ? 'sevil' : mood);
+  if (m==='mutlu') setClip('idle');
+  else if (m==='oyunIstiyor') setClip('paw');
+  else if (m==='acikti' || m==='susadi') setClip('paw');
+  else if (m==='yorgun') setClip('paw');
+  else if (m==='sevil') setClip('pet');
+  else if (m==='tuvaleti') setClip('paw');
+  else if (m==='ilgiIstiyor') setClip('paw');
+  else if (m==='uyuyor') setClip('sleep');
+  else if (m==='ye') setClip('eat');
+  else if (m==='ic') setClip('drink');
+  else if (m==='top' || m==='topSevinc') setClip('play');
+  else if (m==='yuruyus') setClip('idle',1);
+  else if (m==='kosuyor' || m==='topKovala') setClip('run');
+}
+function moveTo(x,cb){ targetX=x; movingCb=cb||null; }
+function updateMove(dt){
+  const dx=targetX-dogX;
+  if(Math.abs(dx)>.6){ const dir=dx>0?1:-1; facing=dir; dogX += dir*Math.min(Math.abs(dx),(action==='topKovala'?34:22)*dt); setClip('run',dir); return true; }
+  if(movingCb){ const f=movingCb; movingCb=null; f(); }
+  return false;
+}
+function startEat(){ if(action||sleeping)return; playSfx('eat'); action='git'; $('food').classList.add('on'); moveTo(26,()=>{action='ye'; actionTimer=3.2; setBubble('ye');}); }
+function startDrink(){ if(action||sleeping)return; playSfx('drink'); action='git'; $('water').classList.add('on'); moveTo(-26,()=>{action='ic'; actionTimer=2.6; setBubble('ic');}); }
+let ballX=0, ballY=0, ballVX=0, ballVY=0;
+function throwBall(){ if(action||sleeping)return; playSfx('run'); action='topKovala'; actionTimer=12; $('ball').classList.add('on'); ballX=(Math.random()*2-1)*30; ballY=55; ballVX=(Math.random()-.5)*30; ballVY=-10; setBubble('oyunIstiyor'); }
+function startWalk(){ if(action||sleeping)return; action='git'; $('tree').classList.add('on'); moveTo(30,()=>{playSfx('toilet'); action='yuruyus'; actionTimer=2.4; setBubble('yuruyus');}); }
+function toggleSleep(){ if(action)return; sleeping=!sleeping; playSfx(sleeping ? 'sleep' : 'bark'); $('night').style.opacity=sleeping?1:0; $('btnUyku').querySelector('.t').textContent=sleeping?'Uyandır':'Uyu'; if(!sleeping){ lastBubble=''; setBubble(pickMood()); } }
+$('btnYemek').onclick=startEat; $('btnSu').onclick=startDrink; $('btnOyun').onclick=throwBall; $('btnTuvalet').onclick=startWalk; $('btnUyku').onclick=toggleSleep;
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function showInstallTip(text){
+  if (isStandalone() || localStorage.getItem('atlas-install-dismissed') === '1') return;
+  installText.textContent = text;
+  installTip.classList.add('on');
+}
+installClose.onclick=()=>{
+  installTip.classList.remove('on');
+  localStorage.setItem('atlas-install-dismissed','1');
+};
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  installPromptEvent=e;
+  showInstallTip('Atlas’ı uygulama gibi kullanmak için buraya dokunup yükleyebilirsin.');
+});
+installTip.addEventListener('click', async e=>{
+  if (e.target === installClose) return;
+  if (!installPromptEvent) return;
+  installTip.classList.remove('on');
+  installPromptEvent.prompt();
+  await installPromptEvent.userChoice.catch(()=>{});
+  installPromptEvent=null;
+});
+window.addEventListener('appinstalled', ()=>{
+  installTip.classList.remove('on');
+  localStorage.setItem('atlas-install-dismissed','1');
+});
+setTimeout(()=>{
+  if (isIOS()) showInstallTip('iPhone’da uygulama gibi kullanmak için Paylaş simgesine dokun, sonra “Ana Ekrana Ekle” seç.');
+}, 1800);
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+}
+
+let petting=false,lastPet=0,petAccum=0,activePetPointer=null;
+function petAtPoint(p, force=false){
+  if (sleeping || action) return;
+  const r = dogWrap.getBoundingClientRect();
+  if (p.x<r.left-26||p.x>r.right+26||p.y<r.top-26||p.y>r.bottom+26) return;
+  const now=performance.now();
+  if (!force && now-lastPet<115) return;
+  lastPet=now;
+  needs.sevgi=Math.min(100,needs.sevgi+(force ? 1.2 : 1.8));
+  petAccum+=force ? 1.2 : 1.8;
+  if (force || petAccum < 4) playSfx('paw');
+  fx('❤️',p.x-13+(Math.random()-.5)*30,p.y-30);
+  if(petAccum>=18){petAccum=0; earnPaws(5,p.x-30,p.y-60);}
+}
+function startPettingAt(p, e){
+  if(sleeping || action) return;
+  e?.preventDefault?.();
+  petting=true;
+  petAtPoint(p, true);
+}
+petHit.addEventListener('pointerdown',e=>{
+  activePetPointer=e.pointerId;
+  petHit.setPointerCapture?.(e.pointerId);
+  startPettingAt({x:e.clientX,y:e.clientY}, e);
+});
+dogWrap.addEventListener('pointerdown',e=>{
+  activePetPointer=e.pointerId;
+  petHit.setPointerCapture?.(e.pointerId);
+  startPettingAt({x:e.clientX,y:e.clientY}, e);
+});
+addEventListener('pointermove',e=>{
+  if(!petting || (activePetPointer!==null && e.pointerId!==activePetPointer)) return;
+  e.preventDefault();
+  petAtPoint({x:e.clientX,y:e.clientY});
+});
+function stopPetting(e){
+  if(activePetPointer!==null) petHit.releasePointerCapture?.(activePetPointer);
+  petting=false; activePetPointer=null;
+}
+addEventListener('pointerup',stopPetting);
+addEventListener('pointercancel',stopPetting);
+petHit.addEventListener('lostpointercapture',stopPetting);
+function touchPoint(e){ const t=e.touches[0] || e.changedTouches[0]; return t ? {x:t.clientX,y:t.clientY} : null; }
+function touchStartsOnDog(e){
+  const p=touchPoint(e); if(!p) return;
+  const r=dogWrap.getBoundingClientRect();
+  if(p.x<r.left-26||p.x>r.right+26||p.y<r.top-26||p.y>r.bottom+26) return;
+  startPettingAt(p, e);
+}
+petHit.addEventListener('touchstart',touchStartsOnDog, {passive:false});
+dogWrap.addEventListener('touchstart',touchStartsOnDog, {passive:false});
+addEventListener('touchmove',e=>{
+  if(!petting) return;
+  const p=touchPoint(e); if(!p) return;
+  e.preventDefault(); petAtPoint(p);
+}, {passive:false});
+addEventListener('touchend',stopPetting);
+addEventListener('touchcancel',stopPetting);
+dogWrap.addEventListener('mousedown',e=>startPettingAt({x:e.clientX,y:e.clientY}, e));
+addEventListener('mousemove',e=>{ if(petting) petAtPoint({x:e.clientX,y:e.clientY}); });
+addEventListener('mouseup',stopPetting);
+
+let last=performance.now(), hudTimer=0, zzzTimer=0, fxTimer=0;
+function tick(now){
+  requestAnimationFrame(tick);
+  const dt=Math.min((now-last)/1000,.05); last=now; t+=dt;
+  for(const k in needs){ let d=DECAY[k]*dt; if(sleeping)d*=(k==='enerji')?0:.3; needs[k]=Math.max(0,needs[k]-d); }
+  if(sleeping){ needs.enerji=Math.min(100,needs.enerji+5*dt); if(needs.enerji>=100){ toggleSleep(); toast('Atlas dinlendi ve uyandı!'); } }
+  const dp=dogScreenPos();
+  if(action==='ye'){ needs.yemek=Math.min(100,needs.yemek+11*dt); actionTimer-=dt; if(Math.random()<dt*3)fx('🍖',dp.x+40,dp.y+120); if(actionTimer<=0){action=null; $('food').classList.remove('on'); earnPaws(10); toast('Afiyet olsun!'); moveTo(0);} }
+  else if(action==='ic'){ needs.su=Math.min(100,needs.su+14*dt); actionTimer-=dt; if(Math.random()<dt*3)fx('💧',dp.x-40,dp.y+120); if(actionTimer<=0){action=null; $('water').classList.remove('on'); earnPaws(8); toast('Su çok iyi geldi!'); moveTo(0);} }
+  else if(action==='topKovala'){
+    ballVY+=120*dt; ballY+=ballVY*dt; ballX+=ballVX*dt; if(ballY>0){ballY=0; ballVY=-Math.abs(ballVY)*.55; ballVX*=.9;} if(ballX>36||ballX<-36)ballVX*=-1;
+    const b=$('ball'); b.style.left='calc(50% + '+ballX+'vw - 18px)'; b.style.bottom='calc(16% + '+(-ballY)*.35+'vh)';
+    moveTo(ballX); actionTimer-=dt; const caught=Math.abs(dogX-ballX)<5&&ballY>-8;
+    if(caught||actionTimer<=0){ if(caught){ needs.oyun=Math.min(100,needs.oyun+32); needs.enerji=Math.max(0,needs.enerji-8); earnPaws(12); toast('Yakaladı!'); action='topSevinc'; actionTimer=1.3; setBubble('top'); fx('✨',dp.x-20,dp.y); fx('✨',dp.x+30,dp.y-20); } else action=null; b.classList.remove('on'); movingCb=null; targetX=dogX; if(!caught)moveTo(0); }
+  } else if(action==='topSevinc'){ actionTimer-=dt; if(actionTimer<=0){ action=null; moveTo(0); } }
+  else if(action==='yuruyus'){ actionTimer-=dt; if(Math.random()<dt*2)fx('✨',innerWidth*.86,innerHeight*.62); if(actionTimer<=0){ action=null; needs.tuvalet=100; earnPaws(10); toast('Rahatladı!'); setTimeout(()=>$('tree').classList.remove('on'),700); moveTo(0); } }
+  const isMoving=updateMove(dt);
+  dogWrap.style.transform='translateX(calc(-50% + '+dogX+'vw))';
+  shadow.style.transform='translateX(calc(-50% + '+dogX+'vw))';
+  if(!isMoving){ mood=pickMood(); if(!action)setBubble(petting&&!sleeping?'sevil':mood); applyMoodVisual(); }
+  if(sleeping){ zzzTimer-=dt; if(zzzTimer<=0){ zzzTimer=1.2; fx('💤',dp.x+50,dp.y); } }
+  if(mood==='oyunIstiyor'&&!action&&!sleeping){ fxTimer-=dt; if(fxTimer<=0){ fxTimer=2.4; fx('🎵',dp.x+(Math.random()-.5)*80,dp.y-10); } }
+  drawDog(ctx,cvs); drawDog(splashCtx,splashCvs);
+  hudTimer-=dt; if(hudTimer<=0){hudTimer=.25; updateHUD();}
+}
+$('startBtn').onclick=async()=>{
+  started=true;
+  await unlockSfx();
+  playSfx('bark');
+  action=null; movingCb=null; dogX=0; targetX=0; facing=1;
+  stopAllVideos();
+  clip='idle';
+  await videos[clip].play().catch(()=>{});
+  const s=$('splash'); s.style.opacity=0; setTimeout(()=>s.remove(),650); setBubble('mutlu');
+};
+setClip('idle'); updateHUD(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
