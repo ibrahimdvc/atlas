@@ -14,7 +14,9 @@
 <style>
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
   html,body { width:100%; height:100%; overflow:hidden; touch-action:none; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif; background:#fff; }
-  #scene { position:fixed; inset:0; overflow:hidden; background:#fff; }
+  #scene { position:fixed; inset:0; overflow:hidden; background:
+    radial-gradient(circle at 50% 8%, rgba(255,193,77,.12), transparent 36%),
+    linear-gradient(180deg,#fff6e8 0%, #fff 34%, #fff 100%); }
   #sun { position:absolute; right:8vw; top:7vh; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,#fff8d5 0%,#ffe49d 45%,transparent 72%); }
   .cloud { position:absolute; width:88px; height:28px; border-radius:40px; background:#fff; opacity:.82; animation:cloud 70s linear infinite; }
   .cloud:before,.cloud:after { content:""; position:absolute; border-radius:50%; background:#fff; }
@@ -33,7 +35,7 @@
 
   .prop { position:absolute; bottom:15%; opacity:0; pointer-events:none; transform:scale(.45); transition:opacity .25s, transform .25s; }
   .prop.on { opacity:1; transform:scale(1); }
-  #ball { width:36px; height:36px; border-radius:50%; background:#ffb22e; }
+  #ball { position:fixed; width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.72); display:grid; place-items:center; font-size:34px; filter:drop-shadow(0 10px 10px rgba(91,65,35,.22)); transform:translate(-50%,-50%) rotate(0deg) scale(.9); transition:opacity .12s, transform .12s; }
   #tree { right:5%; bottom:13%; font-size:108px; }
   .bowl { width:86px; height:44px; }
   .bowl:before { content:""; position:absolute; left:0; bottom:0; width:86px; height:34px; border-radius:8px 8px 22px 22px; }
@@ -47,27 +49,31 @@
   #water:after { background:radial-gradient(ellipse,#d4f1ff 20%,#76c5f9 100%); }
 
   #topbar { position:fixed; top:calc(10px + env(safe-area-inset-top)); left:0; right:0; z-index:10; display:flex; justify-content:space-between; align-items:flex-start; padding:0 12px; pointer-events:none; }
-  .tag,.bank,.need,#bubble { background:rgba(255,255,255,.9); box-shadow:0 3px 10px rgba(0,0,0,.12); }
-  .tag { border-radius:20px; padding:6px 18px 5px; text-align:center; }
+  .tag,.bank,.need,#bubble { background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,248,238,.94)); border:1px solid rgba(132,96,56,.1); box-shadow:0 8px 22px rgba(91,65,35,.14); backdrop-filter:blur(8px); }
+  .tag { border-radius:20px; padding:6px 18px 5px; text-align:center; box-shadow:0 9px 0 rgba(190,134,67,.14),0 14px 24px rgba(91,65,35,.13); }
   .tag .nm { color:#584434; font-size:22px; font-weight:800; line-height:1; }
   .tag .lv { color:#bf8643; font-size:12px; font-weight:800; }
-  .bank { border-radius:20px; padding:8px 16px; color:#584434; font-size:18px; font-weight:800; }
+  .bank { border-radius:20px; padding:8px 16px; color:#584434; font-size:18px; font-weight:800; box-shadow:0 9px 0 rgba(190,134,67,.13),0 14px 24px rgba(91,65,35,.13); }
   .needs { position:fixed; top:calc(88px + env(safe-area-inset-top)); z-index:10; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
   .needs.left { left:10px; } .needs.right { right:10px; }
-  .need { width:64px; border-radius:16px; padding:6px 5px 7px; text-align:center; }
+  .need { width:64px; border-radius:16px; padding:6px 5px 7px; text-align:center; box-shadow:0 7px 0 rgba(205,170,120,.2),0 13px 22px rgba(91,65,35,.14); }
   .need .ico { font-size:22px; line-height:1.1; }
   .need .lbl { color:#745d49; font-size:10px; font-weight:800; line-height:1.15; }
-  .bar { height:8px; margin-top:3px; border-radius:6px; background:#e9e0d2; overflow:hidden; }
+  .bar { height:8px; margin-top:3px; border-radius:6px; background:#eadfce; overflow:hidden; box-shadow:inset 0 1px 3px rgba(97,70,44,.18); }
   .fill { height:100%; width:80%; border-radius:6px; transition:width .35s, background .35s; }
   .low { animation:warn 1s infinite; }
   @keyframes warn { 50%{ box-shadow:0 0 0 4px rgba(255,80,80,.42) } }
-  #bubble { position:fixed; left:50%; top:calc(92px + env(safe-area-inset-top)); z-index:9; transform:translateX(-50%); max-width:62%; border-radius:18px; padding:8px 18px; color:#594838; font-size:15px; font-weight:800; text-align:center; }
+  #bubble { position:fixed; left:50%; top:calc(92px + env(safe-area-inset-top)); z-index:9; transform:translateX(-50%); max-width:62%; border-radius:18px; padding:8px 18px; color:#594838; font-size:15px; font-weight:800; text-align:center; transition:left .18s, top .18s, transform .18s; }
   #bubble:after { content:""; position:absolute; left:50%; bottom:-8px; transform:translateX(-50%); border:9px solid transparent; border-top-color:rgba(255,255,255,.9); border-bottom:0; }
   #actions { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:10; display:flex; justify-content:center; gap:10px; padding:0 10px; }
-  .act { flex:0 1 76px; border:0; border-radius:20px; padding:9px 4px 7px; background:rgba(255,255,255,.93); box-shadow:0 4px 0 rgba(180,150,110,.56),0 8px 16px rgba(0,0,0,.15); font-family:inherit; cursor:pointer; }
+  .act { flex:0 1 76px; border:1px solid rgba(132,96,56,.12); border-radius:20px; padding:9px 4px 7px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,246,232,.95)); box-shadow:0 5px 0 rgba(180,150,110,.52),0 12px 20px rgba(91,65,35,.16); font-family:inherit; cursor:pointer; }
   .act:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(180,150,110,.56); }
-  .act .i { display:block; font-size:26px; line-height:1.15; }
+  .act .i { display:block; width:38px; height:34px; margin:0 auto 1px; border-radius:14px; background:rgba(255,255,255,.72); font-size:26px; line-height:34px; box-shadow:inset 0 -2px 0 rgba(196,142,74,.12); }
   .act .t { color:#6b563f; font-size:11px; font-weight:800; }
+  #playMenu { position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); z-index:22; display:grid; grid-template-columns:repeat(2,1fr); gap:8px; padding:8px; border-radius:22px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,245,230,.94)); border:1px solid rgba(132,96,56,.14); box-shadow:0 14px 34px rgba(91,65,35,.2); transform:translate(-50%,14px) scale(.94); opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; }
+  #playMenu.on { opacity:1; pointer-events:auto; transform:translate(-50%,0) scale(1); }
+  .toyChoice { min-width:92px; border:0; border-radius:16px; padding:8px 10px 7px; background:linear-gradient(180deg,#fff,#fff2dc); color:#644d37; font-family:inherit; font-size:11px; font-weight:900; box-shadow:0 4px 0 rgba(190,134,67,.28),0 9px 16px rgba(91,65,35,.12); }
+  .toyChoice span { display:block; font-size:26px; line-height:1.05; margin-bottom:2px; }
   #toast { position:fixed; left:50%; bottom:120px; z-index:20; transform:translateX(-50%); opacity:0; pointer-events:none; border-radius:22px; padding:10px 22px; background:rgba(60,45,30,.86); color:white; font-size:15px; font-weight:800; transition:opacity .25s; }
   .fx,.floatpt { position:fixed; z-index:20; pointer-events:none; text-shadow:0 2px 4px rgba(0,0,0,.2); animation:rise 1.35s forwards; }
   .fx { font-size:26px; } .floatpt { color:#ff8c1a; font-size:22px; font-weight:900; }
@@ -85,12 +91,11 @@
   #installTip.on { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
   #installTip button { position:absolute; right:8px; top:8px; width:28px; height:28px; border:0; border-radius:50%; background:#f1eadf; color:#594838; font-size:16px; font-weight:900; cursor:pointer; }
   @media (max-width:560px){
-    .needs.left { left:18px; }
-    .needs.right { right:18px; }
+    .needs.left { left:30px; }
+    .needs.right { right:30px; }
     #dogWrap { width:min(96vw,420px); bottom:100px; }
     .act { flex-basis:64px; }
-    #bubble { left:auto; right:10px; top:calc(86px + env(safe-area-inset-top)); max-width:44vw; transform:none; font-size:13px; }
-    #bubble:after { left:auto; right:22px; transform:none; }
+    #bubble { max-width:62vw; font-size:13px; }
   }
   @media (max-width:430px) {
     #topbar { top:calc(7px + env(safe-area-inset-top)); padding:0 8px; }
@@ -99,16 +104,19 @@
     .tag .lv { font-size:10px; }
     .bank { border-radius:15px; padding:6px 12px; font-size:15px; }
     .needs { top:calc(74px + env(safe-area-inset-top)); gap:7px; }
-    .needs.left { left:18px; }
-    .needs.right { right:18px; }
+    .needs.left { left:32px; }
+    .needs.right { right:32px; }
     .need { width:50px; border-radius:13px; padding:5px 4px; }
     .need .ico { font-size:17px; }
     .need .lbl { font-size:8px; }
     .bar { height:6px; }
-    #bubble { left:auto; right:58px; top:calc(74px + env(safe-area-inset-top)); max-width:48vw; padding:6px 11px; font-size:12px; transform:none; }
-    #bubble:after { left:auto; right:18px; transform:none; }
+    #bubble { max-width:68vw; padding:6px 12px; font-size:12px; }
+    #bubble:after { left:50%; right:auto; transform:translateX(-50%); }
     #dogWrap { width:min(102vw,390px); bottom:94px; }
     #actions { bottom:calc(8px + env(safe-area-inset-bottom)); gap:5px; padding:0 5px; }
+    #playMenu { bottom:calc(78px + env(safe-area-inset-bottom)); gap:6px; padding:7px; }
+    .toyChoice { min-width:76px; padding:7px 8px 6px; font-size:10px; }
+    .toyChoice span { font-size:23px; }
     .act { flex:1 1 0; max-width:68px; min-width:0; border-radius:15px; padding:6px 2px 5px; }
     .act .i { font-size:21px; }
     .act .t { font-size:9px; line-height:1.05; overflow-wrap:anywhere; }
@@ -128,14 +136,15 @@
     #bubble { left:calc(50% + min(27vw,210px)); top:calc(54px + env(safe-area-inset-top)); max-width:min(22vw,180px); transform:none; border-radius:14px; padding:5px 12px; font-size:12px; }
     #bubble:after { left:22px; bottom:-6px; transform:none; border-width:7px; border-bottom:0; }
     .needs { top:calc(50px + env(safe-area-inset-top)); gap:6px; }
-    .needs.left { left:42px; }
-    .needs.right { right:42px; }
+    .needs.left { left:92px; }
+    .needs.right { right:92px; }
     .need { width:52px; border-radius:12px; padding:4px 4px 5px; }
     .need .ico { font-size:16px; }
     .need .lbl { font-size:8px; }
     .bar { height:6px; margin-top:2px; }
     #dogWrap { width:min(68vw,520px); bottom:44px; }
-    #actions { left:calc(54px + env(safe-area-inset-left)); right:calc(54px + env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); gap:7px; padding:0; }
+    #actions { left:calc(96px + env(safe-area-inset-left)); right:calc(96px + env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); gap:7px; padding:0; }
+    #playMenu { bottom:calc(62px + env(safe-area-inset-bottom)); }
     .act { flex:0 1 58px; border-radius:14px; padding:5px 3px 4px; box-shadow:0 2px 0 rgba(180,150,110,.45),0 5px 10px rgba(0,0,0,.12); }
     .act .i { font-size:20px; }
     .act .t { font-size:9px; line-height:1.05; }
@@ -148,11 +157,12 @@
     #installTip button { top:5px; right:6px; width:24px; height:24px; font-size:14px; }
   }
   @media (orientation:landscape) and (max-height:390px) {
-    .needs.left { left:58px; }
-    .needs.right { right:58px; }
+    .needs.left { left:112px; }
+    .needs.right { right:112px; }
     #dogWrap { width:min(70vw,500px); bottom:42px; }
     #bubble { top:calc(44px + env(safe-area-inset-top)); max-width:min(21vw,176px); }
-    #actions { left:calc(78px + env(safe-area-inset-left)); right:calc(78px + env(safe-area-inset-right)); }
+    #actions { left:calc(128px + env(safe-area-inset-left)); right:calc(128px + env(safe-area-inset-right)); }
+    #playMenu { bottom:calc(58px + env(safe-area-inset-bottom)); }
     .act { flex-basis:54px; }
   }
 </style>
@@ -190,9 +200,15 @@
 <div id="actions">
   <button class="act" id="btnYemek"><span class="i">🍖</span><span class="t">Besle</span></button>
   <button class="act" id="btnSu"><span class="i">💧</span><span class="t">Su Ver</span></button>
-  <button class="act" id="btnOyun"><span class="i">🎾</span><span class="t">Top At</span></button>
+  <button class="act" id="btnOyun"><span class="i">🎮</span><span class="t">Oyun Oyna</span></button>
   <button class="act" id="btnTuvalet"><span class="i">🌳</span><span class="t">Yürüyüş</span></button>
   <button class="act" id="btnUyku"><span class="i">💤</span><span class="t">Uyu</span></button>
+</div>
+<div id="playMenu" aria-hidden="true">
+  <button class="toyChoice" data-toy="ball" data-side="left"><span>🎾↖</span>Top Sol</button>
+  <button class="toyChoice" data-toy="ball" data-side="right"><span>↗🎾</span>Top Sağ</button>
+  <button class="toyChoice" data-toy="plush" data-side="left"><span>🧸↖</span>Peluş Sol</button>
+  <button class="toyChoice" data-toy="plush" data-side="right"><span>↗🧸</span>Peluş Sağ</button>
 </div>
 <div id="toast"></div>
 
@@ -209,7 +225,7 @@ const VIDEO_FILES = {
   run:'kosma.mp4',
   sleep:'uyuma.mp4'
 };
-const VIDEO_PRELOAD_ORDER = ['paw','eat','drink','pet','run','play','sleep'];
+const VIDEO_PRELOAD_ORDER = ['pet','paw','eat','drink','run','play','sleep'];
 const SFX_FILE = 'atlas_sfx_pack.mp3';
 const SFX = {
   paw:{src:SFX_FILE,start:.15,duration:.75,volume:.35},
@@ -241,10 +257,10 @@ function ensureVideo(key, eager=false) {
   return v;
 }
 function warmVideosSlowly() {
-  let delay = 650;
+  let delay = 120;
   VIDEO_PRELOAD_ORDER.forEach(key => {
     setTimeout(() => ensureVideo(key, true), delay);
-    delay += 850;
+    delay += 650;
   });
 }
 
@@ -253,7 +269,7 @@ const splashCvs = $('splashCanvas'), splashCtx = splashCvs.getContext('2d', { wi
 const petHit = $('petHit');
 const work = document.createElement('canvas'), wctx = work.getContext('2d', { willReadFrequently:true });
 work.width = cvs.width; work.height = cvs.height;
-let clip = 'idle', facing = 1, started = false;
+let clip = 'idle', facing = 1, started = false, splashAlive = true;
 let sfxReady=false;
 const sfxPools = Object.fromEntries(Object.entries(SFX).map(([name,cue]) => [name, {
   index:0,
@@ -304,8 +320,12 @@ function setClip(next, face) {
   clip = next;
   const v = ensureVideo(clip, true);
   if (v) {
-    v.currentTime = 0;
-    if (started) v.play().catch(()=>{});
+    const playCurrent = () => { if (clip === next) v.play().catch(()=>{}); };
+    try { if (v.readyState >= 2) v.currentTime = 0; } catch(e) {}
+    if (started) {
+      if (v.readyState >= 2) playCurrent();
+      else v.addEventListener('canplay', playCurrent, {once:true});
+    }
   }
 }
 function stopAllVideos() {
@@ -321,16 +341,16 @@ function softCleanStudioWhite(img) {
     const max=Math.max(r,g,b), min=Math.min(r,g,b);
     const spread=max-min;
     const brightness=(r+g+b)/3;
-    if (brightness < 204 || spread > 34) continue;
+    if (brightness < 196 || spread > 42) continue;
 
-    const whiten = Math.min(1, Math.max(0, (brightness - 204) / 40));
+    const whiten = Math.min(1, Math.max(0, (brightness - 196) / 42));
     d[i] = r + (255-r) * whiten;
     d[i+1] = g + (255-g) * whiten;
     d[i+2] = b + (255-b) * whiten;
 
-    if (brightness > 224 && spread < 24) {
-      const fade = Math.min(1, Math.max(0, (brightness - 224) / 24));
-      d[i+3] = d[i+3] * (1 - fade * .82);
+    if (brightness > 216 && spread < 30) {
+      const fade = Math.min(1, Math.max(0, (brightness - 216) / 30));
+      d[i+3] = d[i+3] * (1 - fade * .9);
     }
   }
   return img;
@@ -359,6 +379,7 @@ const DECAY = { yemek:.32, su:.42, enerji:.22, oyun:.5, tuvalet:.38, sevgi:.3 };
 let paws=0, bondXP=0, bondLevel=1, mood='mutlu', action=null, sleeping=false;
 let dogX=0, targetX=0, movingCb=null, t=0, actionTimer=0;
 const dogWrap=$('dogWrap'), shadow=$('dogShadow'), bubble=$('bubble'), toastEl=$('toast');
+const playMenu=$('playMenu'), ballEl=$('ball');
 const installTip=$('installTip'), installText=$('installText'), installClose=$('installClose');
 let installPromptEvent=null;
 const FILLC = v => v>55 ? '#6fd66f' : v>28 ? '#ffc14d' : '#ff6b6b';
@@ -379,10 +400,28 @@ const TEXT = {
   yorgun:['Uykum var...','Biraz dinlenmeliyim.'],
   tuvaleti:['Yürüyüşe çıkalım mı?','Dışarı çıkmam lazım!'],
   ilgiIstiyor:['Beni biraz sever misin?','Buradayım!'],
-  uyuyor:['Zzz...'], ye:['Nam nam nam!'], ic:['Su çok iyi geldi!'], top:['Topu kaptım!'], yuruyus:['Ohh, rahatladım!'], sevil:['Bu çok güzel...']
+  uyuyor:['Zzz...'], ye:['Nam nam nam!'], ic:['Su çok iyi geldi!'], top:['Topu kaptım!'], pelus:['Peluşu bana at!','Onu yakalayacağım!'], yuruyus:['Ohh, rahatladım!'], sevil:['Bu çok güzel...']
 };
 let lastBubble='';
 function setBubble(k){ if(k===lastBubble) return; lastBubble=k; const a=TEXT[k]||TEXT.mutlu; bubble.textContent=a[Math.floor(Math.random()*a.length)]; }
+function placeBubble(){
+  const portraitMobile = innerWidth <= 560 && innerHeight > innerWidth;
+  if (!portraitMobile) {
+    bubble.style.left = '';
+    bubble.style.right = '';
+    bubble.style.top = '';
+    bubble.style.transform = '';
+    return;
+  }
+  const r = dogWrap.getBoundingClientRect();
+  const b = bubble.getBoundingClientRect();
+  const topLimit = 76 + (window.visualViewport ? Math.max(0, window.visualViewport.offsetTop) : 0);
+  const top = Math.max(topLimit, r.top + r.height*.18 - b.height);
+  bubble.style.left = '50%';
+  bubble.style.right = 'auto';
+  bubble.style.top = `${top}px`;
+  bubble.style.transform = 'translateX(-50%)';
+}
 function pickMood(){
   if (sleeping) return 'uyuyor';
   const map={yemek:'acikti',su:'susadi',enerji:'yorgun',oyun:'oyunIstiyor',tuvalet:'tuvaleti',sevgi:'ilgiIstiyor'};
@@ -415,13 +454,53 @@ function updateMove(dt){
   if(movingCb){ const f=movingCb; movingCb=null; f(); }
   return false;
 }
-function startEat(){ if(action||sleeping)return; playSfx('eat'); action='git'; $('food').classList.add('on'); moveTo(26,()=>{action='ye'; actionTimer=3.2; setBubble('ye');}); }
-function startDrink(){ if(action||sleeping)return; playSfx('drink'); action='git'; $('water').classList.add('on'); moveTo(-26,()=>{action='ic'; actionTimer=2.6; setBubble('ic');}); }
-let ballX=0, ballY=0, ballVX=0, ballVY=0;
-function throwBall(){ if(action||sleeping)return; playSfx('run'); action='topKovala'; actionTimer=12; $('ball').classList.add('on'); ballX=(Math.random()*2-1)*30; ballY=55; ballVX=(Math.random()-.5)*30; ballVY=-10; setBubble('oyunIstiyor'); }
-function startWalk(){ if(action||sleeping)return; action='git'; $('tree').classList.add('on'); moveTo(30,()=>{playSfx('toilet'); action='yuruyus'; actionTimer=2.4; setBubble('yuruyus');}); }
-function toggleSleep(){ if(action)return; sleeping=!sleeping; playSfx(sleeping ? 'sleep' : 'bark'); $('night').style.opacity=sleeping?1:0; $('btnUyku').querySelector('.t').textContent=sleeping?'Uyandır':'Uyu'; if(!sleeping){ lastBubble=''; setBubble(pickMood()); } }
-$('btnYemek').onclick=startEat; $('btnSu').onclick=startDrink; $('btnOyun').onclick=throwBall; $('btnTuvalet').onclick=startWalk; $('btnUyku').onclick=toggleSleep;
+function startEat(){ if(action||sleeping)return; setPlayMenu(false); playSfx('eat'); action='git'; $('food').classList.add('on'); moveTo(26,()=>{action='ye'; actionTimer=3.2; setBubble('ye');}); }
+function startDrink(){ if(action||sleeping)return; setPlayMenu(false); playSfx('drink'); action='git'; $('water').classList.add('on'); moveTo(-26,()=>{action='ic'; actionTimer=2.6; setBubble('ic');}); }
+let ballX=0, ballY=0, ballVX=0, ballVY=0, toyThrowT=0, toyKind='ball', toySide='right', toyStart=null, toyTarget=null;
+const TOYS = {
+  ball:{icon:'🎾', label:'Top'},
+  plush:{icon:'🧸', label:'Peluş'}
+};
+function setPlayMenu(open){
+  playMenu.classList.toggle('on', open);
+  playMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+}
+function togglePlayMenu(){
+  if(action||sleeping) return;
+  setPlayMenu(!playMenu.classList.contains('on'));
+}
+function throwToy(kind='ball', side='right'){
+  if(action||sleeping)return;
+  setPlayMenu(false);
+  playSfx('run');
+  toyKind=kind;
+  toySide=side;
+  const toy = TOYS[toyKind] || TOYS.ball;
+  const btn = $('btnOyun').getBoundingClientRect();
+  const dog = dogWrap.getBoundingClientRect();
+  const dir = toySide === 'left' ? -1 : 1;
+  toyStart = {x:btn.left+btn.width/2, y:btn.top+btn.height*.35};
+  const targetX = dir < 0 ? innerWidth*.22 : innerWidth*.78;
+  toyTarget = {x:Math.max(56, Math.min(innerWidth-56, targetX)), y:dog.top+dog.height*(.62+Math.random()*.08)};
+  action='topKovala'; actionTimer=12; toyThrowT=0;
+  ballX=dir*(24+Math.random()*10); ballY=42; ballVX=dir*(8+Math.random()*8); ballVY=-18;
+  ballEl.textContent=toy.icon;
+  ballEl.classList.add('on');
+  ballEl.style.left=toyStart.x+'px';
+  ballEl.style.top=toyStart.y+'px';
+  ballEl.style.bottom='auto';
+  ballEl.style.transform='translate(-50%,-50%) rotate(-24deg) scale(.85)';
+  setBubble(kind==='plush' ? 'pelus' : 'oyunIstiyor');
+}
+function startWalk(){ if(action||sleeping)return; setPlayMenu(false); action='git'; $('tree').classList.add('on'); moveTo(30,()=>{playSfx('toilet'); action='yuruyus'; actionTimer=2.4; setBubble('yuruyus');}); }
+function toggleSleep(){ if(action)return; setPlayMenu(false); sleeping=!sleeping; playSfx(sleeping ? 'sleep' : 'bark'); $('night').style.opacity=sleeping?1:0; $('btnUyku').querySelector('.t').textContent=sleeping?'Uyandır':'Uyu'; if(!sleeping){ lastBubble=''; setBubble(pickMood()); } }
+$('btnYemek').onclick=startEat; $('btnSu').onclick=startDrink; $('btnOyun').onclick=togglePlayMenu; $('btnTuvalet').onclick=startWalk; $('btnUyku').onclick=toggleSleep;
+playMenu.querySelectorAll('.toyChoice').forEach(btn=>btn.onclick=()=>throwToy(btn.dataset.toy, btn.dataset.side));
+document.addEventListener('pointerdown', e=>{
+  if (!playMenu.classList.contains('on')) return;
+  if (playMenu.contains(e.target) || $('btnOyun').contains(e.target)) return;
+  setPlayMenu(false);
+});
 
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -482,6 +561,7 @@ function petAtPoint(p, force=false){
 function startPettingAt(p, e){
   if(sleeping || (action && action !== 'topSevinc') || !pointInsideDog(p)) return;
   e?.preventDefault?.();
+  ensureVideo('pet', true);
   petting=true;
   petAtPoint(p, true);
 }
@@ -518,19 +598,44 @@ function tick(now){
   if(action==='ye'){ needs.yemek=Math.min(100,needs.yemek+11*dt); actionTimer-=dt; if(Math.random()<dt*3)fx('🍖',dp.x+40,dp.y+120); if(actionTimer<=0){action=null; $('food').classList.remove('on'); earnPaws(10); toast('Afiyet olsun!'); moveTo(0);} }
   else if(action==='ic'){ needs.su=Math.min(100,needs.su+14*dt); actionTimer-=dt; if(Math.random()<dt*3)fx('💧',dp.x-40,dp.y+120); if(actionTimer<=0){action=null; $('water').classList.remove('on'); earnPaws(8); toast('Su çok iyi geldi!'); moveTo(0);} }
   else if(action==='topKovala'){
-    ballVY+=120*dt; ballY+=ballVY*dt; ballX+=ballVX*dt; if(ballY>0){ballY=0; ballVY=-Math.abs(ballVY)*.55; ballVX*=.9;} if(ballX>36||ballX<-36)ballVX*=-1;
-    const b=$('ball'); b.style.left='calc(50% + '+ballX+'vw - 18px)'; b.style.bottom='calc(16% + '+(-ballY)*.35+'vh)';
-    moveTo(ballX); actionTimer-=dt; const caught=Math.abs(dogX-ballX)<5&&ballY>-8;
-    if(caught||actionTimer<=0){ if(caught){ needs.oyun=Math.min(100,needs.oyun+32); needs.enerji=Math.max(0,needs.enerji-8); earnPaws(12); toast('Yakaladı!'); action='topSevinc'; actionTimer=1.3; setBubble('top'); fx('✨',dp.x-20,dp.y); fx('✨',dp.x+30,dp.y-20); } else action=null; b.classList.remove('on'); movingCb=null; targetX=dogX; if(!caught)moveTo(0); }
+    const b=ballEl;
+    toyThrowT+=dt;
+    if(toyThrowT<.62 && toyStart && toyTarget){
+      const p=Math.min(1,toyThrowT/.62);
+      const ease=1-Math.pow(1-p,3);
+      const arc=Math.sin(p*Math.PI)*Math.min(110,innerHeight*.18);
+      const x=toyStart.x+(toyTarget.x-toyStart.x)*ease;
+      const y=toyStart.y+(toyTarget.y-toyStart.y)*ease-arc;
+      b.style.left=x+'px';
+      b.style.top=y+'px';
+      b.style.bottom='auto';
+      b.style.transform=`translate(-50%,-50%) rotate(${p*420-24}deg) scale(${.88+p*.22})`;
+      moveTo(ballX);
+    } else {
+      if (toyTarget && toyThrowT - dt < .62) {
+        const landed = (toyTarget.x / innerWidth - .5) * 100;
+        ballX = Math.max(-38, Math.min(38, landed));
+        ballY = 0;
+      }
+      ballVY+=120*dt; ballY+=ballVY*dt; ballX+=ballVX*dt; if(ballY>0){ballY=0; ballVY=-Math.abs(ballVY)*.55; ballVX*=.9;} if(ballX>36||ballX<-36)ballVX*=-1;
+      b.style.left='calc(50% + '+ballX+'vw)';
+      b.style.top='auto';
+      b.style.bottom='calc(16% + '+(-ballY)*.35+'vh)';
+      b.style.transform=`translate(-50%,50%) rotate(${t*320}deg) scale(1)`;
+      moveTo(ballX);
+    }
+    actionTimer-=dt; const caught=toyThrowT>.65&&Math.abs(dogX-ballX)<5&&ballY>-8;
+    if(caught||actionTimer<=0){ if(caught){ needs.oyun=Math.min(100,needs.oyun+(toyKind==='plush'?26:32)); needs.enerji=Math.max(0,needs.enerji-(toyKind==='plush'?5:8)); earnPaws(toyKind==='plush'?10:12); toast((TOYS[toyKind]?.label||'Oyuncak')+' yakalandı!'); action='topSevinc'; actionTimer=1.3; setBubble(toyKind==='plush'?'pelus':'top'); fx('✨',dp.x-20,dp.y); fx('✨',dp.x+30,dp.y-20); } else action=null; b.classList.remove('on'); movingCb=null; targetX=dogX; if(!caught)moveTo(0); }
   } else if(action==='topSevinc'){ actionTimer-=dt; if(actionTimer<=0){ action=null; moveTo(0); } }
   else if(action==='yuruyus'){ actionTimer-=dt; if(Math.random()<dt*2)fx('✨',innerWidth*.86,innerHeight*.62); if(actionTimer<=0){ action=null; needs.tuvalet=100; earnPaws(10); toast('Rahatladı!'); setTimeout(()=>$('tree').classList.remove('on'),700); moveTo(0); } }
   const isMoving=updateMove(dt);
   dogWrap.style.transform='translateX(calc(-50% + '+dogX+'vw))';
   shadow.style.transform='translateX(calc(-50% + '+dogX+'vw))';
   if(!isMoving){ mood=pickMood(); if(!action)setBubble(petting&&!sleeping?'sevil':mood); applyMoodVisual(); }
+  placeBubble();
   if(sleeping){ zzzTimer-=dt; if(zzzTimer<=0){ zzzTimer=1.2; fx('💤',dp.x+50,dp.y); } }
   if(mood==='oyunIstiyor'&&!action&&!sleeping){ fxTimer-=dt; if(fxTimer<=0){ fxTimer=2.4; fx('🎵',dp.x+(Math.random()-.5)*80,dp.y-10); } }
-  drawDog(ctx,cvs); drawDog(splashCtx,splashCvs);
+  drawDog(ctx,cvs); if (splashAlive) drawDog(splashCtx,splashCvs);
   hudTimer-=dt; if(hudTimer<=0){hudTimer=.25; updateHUD();}
 }
 $('startBtn').onclick=async()=>{
@@ -543,9 +648,9 @@ $('startBtn').onclick=async()=>{
   ensureVideo(clip, true);
   await videos[clip].play().catch(()=>{});
   warmVideosSlowly();
-  const s=$('splash'); s.style.opacity=0; setTimeout(()=>s.remove(),650); setBubble('mutlu');
+  const s=$('splash'); s.style.opacity=0; setTimeout(()=>{ splashAlive=false; s.remove(); },650); setBubble('mutlu');
 };
-ensureVideo('idle', true); setClip('idle'); updateHUD(); requestAnimationFrame(tick);
+ensureVideo('idle', true); ensureVideo('pet', true); setClip('idle'); updateHUD(); requestAnimationFrame(tick);
 </script>
 </body>
 </html>
