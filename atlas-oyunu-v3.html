@@ -26,9 +26,9 @@
   #sun,.cloud,#floorGlow { display:none; }
 
   #dogShadow { display:none; }
-  #dogWrap { position:absolute; left:50%; bottom:16%; width:min(62vw,430px); aspect-ratio:960/760; transform:translateX(-50%); will-change:transform; }
+  #dogWrap { position:absolute; left:50%; bottom:16%; width:min(66vw,460px); aspect-ratio:960/760; transform:translateX(-50%); will-change:transform; touch-action:none; }
   #dogCanvas { position:absolute; inset:0; width:100%; height:100%; }
-  #petHit { position:absolute; inset:-5% -8%; }
+  #petHit { position:absolute; inset:-12% -14%; touch-action:none; }
   #videoBank { position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; }
 
   .prop { position:absolute; bottom:15%; opacity:0; pointer-events:none; transform:scale(.45); transition:opacity .25s, transform .25s; }
@@ -85,9 +85,10 @@
   #installTip.on { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
   #installTip button { position:absolute; right:8px; top:8px; width:28px; height:28px; border:0; border-radius:50%; background:#f1eadf; color:#594838; font-size:16px; font-weight:900; cursor:pointer; }
   @media (max-width:560px){
-    #dogWrap { width:70vw; bottom:17%; }
+    #dogWrap { width:min(86vw,360px); bottom:112px; }
     .act { flex-basis:64px; }
-    #bubble { max-width:58%; font-size:13px; }
+    #bubble { left:auto; right:10px; top:calc(86px + env(safe-area-inset-top)); max-width:44vw; transform:none; font-size:13px; }
+    #bubble:after { left:auto; right:22px; transform:none; }
   }
   @media (max-width:430px) {
     #topbar { top:calc(7px + env(safe-area-inset-top)); padding:0 8px; }
@@ -102,8 +103,9 @@
     .need .ico { font-size:17px; }
     .need .lbl { font-size:8px; }
     .bar { height:6px; }
-    #bubble { top:calc(80px + env(safe-area-inset-top)); max-width:54%; padding:6px 12px; font-size:12px; }
-    #dogWrap { width:min(76vw,300px); bottom:108px; }
+    #bubble { left:auto; right:58px; top:calc(74px + env(safe-area-inset-top)); max-width:48vw; padding:6px 11px; font-size:12px; transform:none; }
+    #bubble:after { left:auto; right:18px; transform:none; }
+    #dogWrap { width:min(88vw,342px); bottom:104px; }
     #actions { bottom:calc(8px + env(safe-area-inset-bottom)); gap:5px; padding:0 5px; }
     .act { flex:1 1 0; max-width:68px; min-width:0; border-radius:15px; padding:6px 2px 5px; }
     .act .i { font-size:21px; }
@@ -121,8 +123,8 @@
     .tag .nm { font-size:17px; }
     .tag .lv { font-size:10px; }
     .bank { border-radius:14px; padding:5px 11px; font-size:15px; }
-    #bubble { top:calc(46px + env(safe-area-inset-top)); max-width:44%; border-radius:14px; padding:5px 12px; font-size:12px; }
-    #bubble:after { bottom:-6px; border-width:7px; border-bottom:0; }
+    #bubble { left:calc(50% + min(27vw,210px)); top:calc(54px + env(safe-area-inset-top)); max-width:min(22vw,180px); transform:none; border-radius:14px; padding:5px 12px; font-size:12px; }
+    #bubble:after { left:22px; bottom:-6px; transform:none; border-width:7px; border-bottom:0; }
     .needs { top:calc(50px + env(safe-area-inset-top)); gap:6px; }
     .needs.left { left:6px; }
     .needs.right { right:6px; }
@@ -130,8 +132,8 @@
     .need .ico { font-size:16px; }
     .need .lbl { font-size:8px; }
     .bar { height:6px; margin-top:2px; }
-    #dogWrap { width:min(44vw,330px); bottom:58px; }
-    #actions { bottom:calc(6px + env(safe-area-inset-bottom)); gap:6px; padding:0 70px; }
+    #dogWrap { width:min(56vw,430px); bottom:52px; }
+    #actions { left:calc(54px + env(safe-area-inset-left)); right:calc(54px + env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); gap:7px; padding:0; }
     .act { flex:0 1 58px; border-radius:14px; padding:5px 3px 4px; box-shadow:0 2px 0 rgba(180,150,110,.45),0 5px 10px rgba(0,0,0,.12); }
     .act .i { font-size:20px; }
     .act .t { font-size:9px; line-height:1.05; }
@@ -142,6 +144,12 @@
     #startBtn { font-size:16px; padding:9px 28px; box-shadow:0 4px 0 #d96e00,0 8px 18px rgba(217,110,0,.28); }
     #installTip { top:48px; bottom:auto; width:min(78vw,420px); padding:8px 38px 8px 12px; font-size:11px; border-radius:14px; }
     #installTip button { top:5px; right:6px; width:24px; height:24px; font-size:14px; }
+  }
+  @media (orientation:landscape) and (max-height:390px) {
+    #dogWrap { width:min(60vw,410px); bottom:48px; }
+    #bubble { top:calc(44px + env(safe-area-inset-top)); max-width:min(21vw,176px); }
+    #actions { left:calc(78px + env(safe-area-inset-left)); right:calc(78px + env(safe-area-inset-right)); }
+    .act { flex-basis:54px; }
   }
 </style>
 </head>
@@ -451,21 +459,24 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 let petting=false,lastPet=0,petAccum=0,activePetPointer=null;
-function petAtPoint(p, force=false){
-  if (sleeping || action) return;
+function pointInsideDog(p, pad=46){
   const r = dogWrap.getBoundingClientRect();
-  if (p.x<r.left-26||p.x>r.right+26||p.y<r.top-26||p.y>r.bottom+26) return;
+  return p.x>=r.left-pad && p.x<=r.right+pad && p.y>=r.top-pad && p.y<=r.bottom+pad;
+}
+function petAtPoint(p, force=false){
+  if (sleeping || (action && action !== 'topSevinc')) return;
+  if (!pointInsideDog(p)) return;
   const now=performance.now();
-  if (!force && now-lastPet<115) return;
+  if (!force && now-lastPet<82) return;
   lastPet=now;
-  needs.sevgi=Math.min(100,needs.sevgi+(force ? 1.2 : 1.8));
-  petAccum+=force ? 1.2 : 1.8;
-  if (force || petAccum < 4) playSfx('paw');
+  needs.sevgi=Math.min(100,needs.sevgi+(force ? 1.8 : 2.4));
+  petAccum+=force ? 1.8 : 2.4;
+  if (force || petAccum < 5) playSfx('paw');
   fx('❤️',p.x-13+(Math.random()-.5)*30,p.y-30);
-  if(petAccum>=18){petAccum=0; earnPaws(5,p.x-30,p.y-60);}
+  if(petAccum>=20){petAccum=0; earnPaws(5,p.x-30,p.y-60);}
 }
 function startPettingAt(p, e){
-  if(sleeping || action) return;
+  if(sleeping || (action && action !== 'topSevinc') || !pointInsideDog(p)) return;
   e?.preventDefault?.();
   petting=true;
   petAtPoint(p, true);
@@ -492,25 +503,6 @@ function stopPetting(e){
 addEventListener('pointerup',stopPetting);
 addEventListener('pointercancel',stopPetting);
 petHit.addEventListener('lostpointercapture',stopPetting);
-function touchPoint(e){ const t=e.touches[0] || e.changedTouches[0]; return t ? {x:t.clientX,y:t.clientY} : null; }
-function touchStartsOnDog(e){
-  const p=touchPoint(e); if(!p) return;
-  const r=dogWrap.getBoundingClientRect();
-  if(p.x<r.left-26||p.x>r.right+26||p.y<r.top-26||p.y>r.bottom+26) return;
-  startPettingAt(p, e);
-}
-petHit.addEventListener('touchstart',touchStartsOnDog, {passive:false});
-dogWrap.addEventListener('touchstart',touchStartsOnDog, {passive:false});
-addEventListener('touchmove',e=>{
-  if(!petting) return;
-  const p=touchPoint(e); if(!p) return;
-  e.preventDefault(); petAtPoint(p);
-}, {passive:false});
-addEventListener('touchend',stopPetting);
-addEventListener('touchcancel',stopPetting);
-dogWrap.addEventListener('mousedown',e=>startPettingAt({x:e.clientX,y:e.clientY}, e));
-addEventListener('mousemove',e=>{ if(petting) petAtPoint({x:e.clientX,y:e.clientY}); });
-addEventListener('mouseup',stopPetting);
 
 let last=performance.now(), hudTimer=0, zzzTimer=0, fxTimer=0;
 function tick(now){
