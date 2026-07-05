@@ -51,28 +51,66 @@
   #water:after { background:radial-gradient(ellipse,#d4f1ff 20%,#76c5f9 100%); }
 
   #topbar { position:fixed; top:calc(10px + env(safe-area-inset-top)); left:0; right:0; z-index:10; display:flex; justify-content:space-between; align-items:flex-start; padding:0 12px; pointer-events:none; }
-  .tag,.bank,.need,#bubble { background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,248,238,.94)); border:1px solid rgba(132,96,56,.1); box-shadow:0 8px 22px rgba(91,65,35,.14); backdrop-filter:blur(8px); }
+  .tag,.bank,#bubble { background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,248,238,.94)); border:1px solid rgba(132,96,56,.1); box-shadow:0 8px 22px rgba(91,65,35,.14); backdrop-filter:blur(8px); }
   .tag { border-radius:20px; padding:6px 18px 5px; text-align:center; box-shadow:0 9px 0 rgba(190,134,67,.14),0 14px 24px rgba(91,65,35,.13); }
   .tag .nm { color:#584434; font-size:22px; font-weight:800; line-height:1; }
   .tag .lv { color:#bf8643; font-size:12px; font-weight:800; }
   .bank { border-radius:20px; padding:8px 16px; color:#584434; font-size:18px; font-weight:800; box-shadow:0 9px 0 rgba(190,134,67,.13),0 14px 24px rgba(91,65,35,.13); }
-  .needs { position:fixed; top:calc(88px + env(safe-area-inset-top)); z-index:10; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
-  .needs.left { left:10px; } .needs.right { right:10px; }
-  .need { width:64px; border-radius:16px; padding:6px 5px 7px; text-align:center; box-shadow:0 7px 0 rgba(205,170,120,.2),0 13px 22px rgba(91,65,35,.14); }
-  .need .ico { font-size:22px; line-height:1.1; }
-  .need .lbl { color:#745d49; font-size:10px; font-weight:800; line-height:1.15; }
-  .bar { height:8px; margin-top:3px; border-radius:6px; background:#eadfce; overflow:hidden; box-shadow:inset 0 1px 3px rgba(97,70,44,.18); }
-  .fill { height:100%; width:80%; border-radius:6px; transition:width .35s, background .35s; }
-  .low { animation:warn 1s infinite; }
-  @keyframes warn { 50%{ box-shadow:0 0 0 4px rgba(255,80,80,.42) } }
+  .needs { position:fixed; top:calc(88px + env(safe-area-inset-top)); z-index:10; display:flex; flex-direction:column; gap:12px; pointer-events:none; }
+  .needs.left { left:12px; } .needs.right { right:12px; }
+  .need { width:74px; border-radius:22px; padding:8px 5px 7px; text-align:center;
+    background:linear-gradient(180deg,var(--cd1,#fff),var(--cd2,#ffe9da));
+    border:2px solid rgba(255,255,255,.55);
+    box-shadow:0 4px 0 var(--ce,#e3ad76),0 12px 20px rgba(91,65,35,.28), inset 0 1px 0 rgba(255,255,255,.55);
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+  .need.bump { transform:scale(1.14) rotate(-2deg); }
+  .need[data-k="yemek"] { --cd1:#ffdcb8; --cd2:#ff9c56; --ce:#dd7c2e; }
+  .need[data-k="su"] { --cd1:#c7ebff; --cd2:#4fabf2; --ce:#2f86c9; }
+  .need[data-k="enerji"] { --cd1:#ffedb0; --cd2:#ffc830; --ce:#d99a12; }
+  .need[data-k="oyun"] { --cd1:#e0f8bd; --cd2:#84d24e; --ce:#5aa62c; }
+  .need[data-k="tuvalet"] { --cd1:#c9f0cd; --cd2:#5cbb71; --ce:#3f9752; }
+  .need[data-k="sevgi"] { --cd1:#ffd6e4; --cd2:#ff7fa8; --ce:#dd5583; }
+  .ring { position:relative; width:50px; height:50px; margin:0 auto 4px; border-radius:50%;
+    background:conic-gradient(var(--c,#6fd66f) calc(var(--p,80)*1%), rgba(255,255,255,.35) 0);
+    box-shadow:0 3px 8px rgba(0,0,0,.18);
+    display:flex; align-items:center; justify-content:center; transition:background .5s; }
+  .ring:before { content:""; position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#fffdf8,#fff2e0);
+    box-shadow:inset 0 2px 3px rgba(97,70,44,.18), inset 0 -2px 2px rgba(255,255,255,.6); }
+  .ring:after { content:""; position:absolute; top:2px; left:11px; width:52%; height:32%; border-radius:50%;
+    background:rgba(255,255,255,.65); filter:blur(2px); pointer-events:none; }
+  .ring .ico { position:relative; z-index:1; font-size:22px; line-height:1; filter:drop-shadow(0 2px 1px rgba(120,80,30,.35)); }
+  .need .lbl { color:#fff; font-size:10.5px; font-weight:900; line-height:1.15; text-shadow:0 1px 2px rgba(70,40,10,.35); }
+  .low .ring { animation:ringWarn 1s infinite; }
+  @keyframes ringWarn { 0%,100%{ box-shadow:0 3px 8px rgba(0,0,0,.18), 0 0 0 0 rgba(255,80,80,.6) } 50%{ box-shadow:0 3px 8px rgba(0,0,0,.18), 0 0 0 6px rgba(255,80,80,0) } }
   #bubble { position:fixed; left:50%; top:calc(92px + env(safe-area-inset-top)); z-index:9; transform:translateX(-50%); max-width:62%; border-radius:18px; padding:8px 18px; color:#594838; font-size:15px; font-weight:800; text-align:center; transition:left .18s, top .18s, transform .18s; }
   #bubble:after { content:""; position:absolute; left:50%; bottom:-8px; transform:translateX(-50%); border:9px solid transparent; border-top-color:rgba(255,255,255,.9); border-bottom:0; }
   #actions { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:10; display:flex; justify-content:center; gap:10px; padding:0 10px; }
-  .act { flex:0 1 76px; border:1px solid rgba(132,96,56,.12); border-radius:20px; padding:9px 4px 7px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,246,232,.95)); box-shadow:0 5px 0 rgba(180,150,110,.52),0 12px 20px rgba(91,65,35,.16); font-family:inherit; cursor:pointer; }
-  .act:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(180,150,110,.56); }
-  .act .i { display:block; width:38px; height:34px; margin:0 auto 1px; border-radius:14px; background:rgba(255,255,255,.72); font-size:26px; line-height:34px; box-shadow:inset 0 -2px 0 rgba(196,142,74,.12); }
-  .act .t { color:#6b563f; font-size:11px; font-weight:800; }
-  #playMenu { position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); z-index:22; display:grid; grid-template-columns:repeat(2,1fr); gap:8px; padding:8px; border-radius:22px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,245,230,.94)); border:1px solid rgba(132,96,56,.14); box-shadow:0 14px 34px rgba(91,65,35,.2); transform:translate(-50%,14px) scale(.94); opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; }
+  .act { position:relative; flex:0 1 80px; border:2px solid rgba(255,255,255,.5); border-radius:22px; padding:10px 5px 8px;
+    background:linear-gradient(180deg,var(--b1,#fff),var(--b2,#ffe6cf));
+    box-shadow:0 5px 0 var(--be,#d9822e),0 14px 22px rgba(91,65,35,.28), inset 0 1px 0 rgba(255,255,255,.6);
+    font-family:inherit; cursor:pointer; transition:transform .12s; }
+  .act:active { transform:translateY(4px) scale(.96); box-shadow:0 1px 0 var(--be,#d9822e); }
+  .act .i { position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; width:48px; height:44px; margin:0 auto 3px; border-radius:16px; font-size:26px; line-height:1;
+    background:linear-gradient(160deg,var(--t1,#fff),var(--t2,#ffe9d2));
+    box-shadow:0 2px 5px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -4px 6px rgba(120,80,30,.22); }
+  .act .i:after { content:""; position:absolute; top:-8%; left:8%; right:8%; height:48%; border-radius:50%;
+    background:rgba(255,255,255,.6); filter:blur(1.5px); pointer-events:none; }
+  .act .i .emoji { position:relative; z-index:1; display:inline-block; filter:drop-shadow(0 2px 1px rgba(80,40,10,.3)); }
+  .act .i .dot { position:absolute; top:-4px; right:-4px; width:13px; height:13px; border-radius:50%; background:#ff4d4d; box-shadow:0 0 0 2.5px #fff, 0 2px 4px rgba(0,0,0,.3); z-index:2; display:none; animation:dotPulse 1.1s infinite; }
+  .act.urgent .i .dot { display:block; }
+  @keyframes dotPulse { 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.35) } }
+  #btnYemek { --b1:#ffe6c9; --b2:#ffb066; --be:#dd7c2e; }
+  #btnYemek .i { --t1:#ffd9b0; --t2:#ff9c56; }
+  #btnSu { --b1:#d6f0ff; --b2:#7cc3f5; --be:#2f86c9; }
+  #btnSu .i { --t1:#bfe6ff; --t2:#55b0f2; }
+  #btnOyun { --b1:#e3f7c9; --b2:#a3dd76; --be:#5aa62c; }
+  #btnOyun .i { --t1:#d3f5b0; --t2:#84d24e; }
+  #btnTuvalet { --b1:#d3f0d6; --b2:#8fce9e; --be:#3f9752; }
+  #btnTuvalet .i { --t1:#c3ecc6; --t2:#69c17c; }
+  #btnUyku { --b1:#ece2fb; --b2:#bda3ef; --be:#7c53c9; }
+  #btnUyku .i { --t1:#ddd0f7; --t2:#a17ee8; }
+  .act .t { color:#5a3f22; font-size:11.5px; font-weight:900; text-shadow:0 1px 0 rgba(255,255,255,.4); }
+  #playMenu { position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); z-index:22; display:flex; gap:10px; padding:8px; border-radius:22px; background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,245,230,.94)); border:1px solid rgba(132,96,56,.14); box-shadow:0 14px 34px rgba(91,65,35,.2); transform:translate(-50%,14px) scale(.94); opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; }
   #playMenu.on { opacity:1; pointer-events:auto; transform:translate(-50%,0) scale(1); }
   .toyChoice { min-width:92px; border:0; border-radius:16px; padding:8px 10px 7px; background:linear-gradient(180deg,#fff,#fff2dc); color:#644d37; font-family:inherit; font-size:11px; font-weight:900; box-shadow:0 4px 0 rgba(190,134,67,.28),0 9px 16px rgba(91,65,35,.12); }
   .toyChoice span { display:block; width:34px; height:30px; margin:0 auto 3px; background-repeat:no-repeat; background-color:#fff; box-shadow:inset 0 -1px 0 rgba(196,142,74,.12); }
@@ -88,6 +126,12 @@
   #splash h1 { margin-top:8px; color:#584434; font-size:60px; font-weight:900; letter-spacing:4px; text-shadow:0 3px 0 rgba(232,134,44,.35); }
   #splash p { color:#6b563f; font-size:16px; font-weight:800; margin:4px 0 26px; }
   #startBtn { border:0; border-radius:40px; padding:15px 50px; background:linear-gradient(#ffb03a,#ff8c1a); box-shadow:0 6px 0 #d96e00,0 12px 24px rgba(217,110,0,.35); color:white; font-family:inherit; font-size:23px; font-weight:900; cursor:pointer; }
+  #startBtn[disabled] { opacity:.45; cursor:default; box-shadow:0 6px 0 rgba(217,110,0,.35),0 12px 24px rgba(217,110,0,.18); }
+  #loadWrap { width:min(70vw,320px); margin-top:22px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  #loadBarTrack { width:100%; height:12px; border-radius:8px; background:#f1e6d3; box-shadow:inset 0 2px 4px rgba(97,70,44,.18); overflow:hidden; }
+  #loadBarFill { height:100%; width:0%; border-radius:8px; background:linear-gradient(90deg,#ffb03a,#ff8c1a); transition:width .18s ease-out; }
+  #loadText { color:#8a6f52; font-size:13px; font-weight:800; }
+
   #installTip { position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom)); z-index:45; width:min(92vw,430px);
     transform:translate(-50%,18px); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
     border:1px solid rgba(90,68,52,.12); border-radius:18px; padding:12px 44px 12px 14px;
@@ -97,7 +141,7 @@
   @media (max-width:560px){
     .needs.left { left:30px; }
     .needs.right { right:30px; }
-    #dogWrap { width:min(96vw,420px); bottom:100px; }
+    #dogWrap { width:min(96vw,420px); bottom:145px; }
     .act { flex-basis:64px; }
     #bubble { max-width:62vw; font-size:13px; }
   }
@@ -116,7 +160,7 @@
     .bar { height:6px; }
     #bubble { max-width:68vw; padding:6px 12px; font-size:12px; }
     #bubble:after { left:50%; right:auto; transform:translateX(-50%); }
-    #dogWrap { width:min(102vw,390px); bottom:94px; }
+    #dogWrap { width:min(102vw,390px); bottom:138px; }
     #actions { bottom:calc(8px + env(safe-area-inset-bottom)); gap:5px; padding:0 5px; }
     #playMenu { bottom:calc(78px + env(safe-area-inset-bottom)); gap:6px; padding:7px; }
     .toyChoice { min-width:76px; padding:7px 8px 6px; font-size:10px; }
@@ -169,6 +213,74 @@
     #playMenu { bottom:calc(58px + env(safe-area-inset-bottom)); }
     .act { flex-basis:54px; }
   }
+
+/* ============ YURUYUS MINI OYUNU (ARCADE) ============ */
+#walkGame { position:fixed; inset:0; z-index:60; display:none; overflow:hidden; background:#bfe3ff; }
+#walkGame.on { display:block; }
+#wgSky { position:absolute; inset:0; background-image:url('gokyuzu-arka.png'); background-size:cover; background-position:center 30%; }
+#wgSun { position:absolute; top:6%; right:10%; width:58px; height:58px; border-radius:50%;
+  background:radial-gradient(circle,#fff8d5 0%,#ffe49d 55%,transparent 75%); }
+.wgCloud { position:absolute; width:58px; height:18px; border-radius:30px; background:#fff; opacity:.92; animation:wgCloudMove linear infinite; }
+.wgCloud:before,.wgCloud:after { content:""; position:absolute; border-radius:50%; background:#fff; }
+.wgCloud:before { width:24px; height:24px; left:8px; top:-11px; }
+.wgCloud:after { width:18px; height:18px; left:30px; top:-7px; }
+#wgCloud1 { top:12%; animation-duration:24s; }
+#wgCloud2 { top:20%; transform:scale(.8); animation-duration:32s; animation-delay:-12s; }
+@keyframes wgCloudMove { from{ left:112%; } to{ left:-20%; } }
+#wgGroundStrip { position:absolute; left:0; right:0; bottom:0; height:26%; z-index:2;
+  background-image:url('zemin-serit.png'); background-size:cover; background-position:center; }
+#wgGroundStrip:before { content:""; position:absolute; inset:-1px -1px auto -1px; height:14%;
+  background:linear-gradient(180deg, rgba(234,246,255,.55), rgba(234,246,255,0)); pointer-events:none; }
+#wgScene { position:absolute; inset:0; overflow:hidden; z-index:5; }
+.wgObj { position:absolute; bottom:19%; will-change:transform; }
+.wgObj img { display:block; height:60px; width:auto; filter:drop-shadow(0 6px 4px rgba(0,0,0,.25)); }
+#wgDogShadow { position:absolute; left:15%; bottom:18%; width:70px; height:13px; z-index:6; transform:translateX(-50%);
+  background:radial-gradient(ellipse,rgba(20,15,10,.42) 0%,rgba(20,15,10,0) 75%); }
+#wgDog { position:absolute; left:15%; bottom:19%; height:17%; z-index:7; transform:translateX(-50%); }
+#wgDog img { height:100%; width:auto; display:block; filter:drop-shadow(0 6px 4px rgba(0,0,0,.32)); }
+#wgDogHit { position:absolute; left:53%; top:22%; width:22%; height:54%; }
+#wgHUD { position:absolute; top:calc(10px + env(safe-area-inset-top)); left:0; right:0; z-index:9;
+  display:flex; justify-content:space-between; align-items:center; padding:0 14px; }
+#wgScoreWrap { display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+#wgScore { background:rgba(255,255,255,.82); border-radius:16px; padding:7px 18px; font-weight:900; color:#584434;
+  font-size:16px; box-shadow:0 4px 10px rgba(0,0,0,.15); }
+#wgBest { background:rgba(255,255,255,.6); border-radius:12px; padding:3px 13px; font-weight:800; color:#6b563f;
+  font-size:12px; }
+#wgClose { width:34px; height:34px; border-radius:50%; border:0; background:rgba(255,255,255,.88); font-size:16px; font-weight:900;
+  color:#594838; box-shadow:0 3px 8px rgba(0,0,0,.22); }
+#wgJumpBtn { position:absolute; right:calc(22px + env(safe-area-inset-right)); bottom:calc(26px + env(safe-area-inset-bottom));
+  width:84px; height:84px; border-radius:50%; border:2px solid rgba(255,255,255,.65); z-index:9; touch-action:none;
+  background:linear-gradient(180deg,#d6f0ff,#7cc3f5); box-shadow:0 6px 0 #2f86c9,0 12px 20px rgba(0,0,0,.28);
+  font-size:32px; color:#fff; font-weight:900; font-family:inherit; }
+#wgJumpBtn:active { transform:translateY(5px); box-shadow:0 1px 0 #2f86c9; }
+#wgScene { touch-action:none; }
+#wgEndCard { position:absolute; inset:0; z-index:20; display:none; align-items:center; justify-content:center; background:rgba(40,30,20,.4); }
+#wgEndCard.on { display:flex; }
+#wgEndCard .card { background:#fff; border-radius:24px; padding:26px 28px; text-align:center; max-width:80vw;
+  box-shadow:0 20px 40px rgba(0,0,0,.32); }
+#wgEndBadge { display:none; font-size:13px; font-weight:900; color:#ff8c1a; margin-bottom:6px; }
+#wgEndCard h2 { color:#584434; font-size:22px; margin-bottom:6px; }
+#wgEndCard p { color:#6b563f; font-size:14px; margin-bottom:16px; }
+#wgEndCard button { border:0; border-radius:30px; padding:11px 28px; background:linear-gradient(#ffb03a,#ff8c1a);
+  color:#fff; font-family:inherit; font-weight:900; font-size:15px; box-shadow:0 5px 0 #d96e00; }
+.wgObj.bone img { height:34px; }
+.wgObj.bone.float { bottom:38%; }
+.wgObj.bone.ground { bottom:19%; }
+.wgFx { position:absolute; z-index:8; pointer-events:none; font-weight:900; color:#584434; font-size:14px;
+  text-shadow:0 2px 4px rgba(0,0,0,.25); animation:rise 1.1s forwards; }
+.wgFx.bonefx { color:#ff8c1a; font-size:16px; }
+#walkGame.shake { animation:wgShake .32s; }
+@keyframes wgShake {
+  10%,90%{ transform:translateX(-1px); } 20%,80%{ transform:translateX(2px); }
+  30%,50%,70%{ transform:translateX(-4px); } 40%,60%{ transform:translateX(4px); }
+}
+@media (max-width:430px){
+  #wgDog { height:15%; }
+  .wgObj img { height:48px; }
+  .wgObj.bone img { height:28px; }
+  #wgJumpBtn { width:70px; height:70px; font-size:26px; }
+}
+
 </style>
 </head>
 <body>
@@ -184,7 +296,11 @@
 <div id="splash">
   <canvas id="splashCanvas" width="960" height="760"></canvas>
   <h1>ATLAS</h1><p>Gerçek hareketlerle oyunda seni bekliyor!</p>
-  <button id="startBtn">▶ Oyuna Başla</button>
+  <button id="startBtn" disabled>▶ Oyuna Başla</button>
+  <div id="loadWrap">
+    <div id="loadBarTrack"><div id="loadBarFill"></div></div>
+    <div id="loadText">Yükleniyor… %0</div>
+  </div>
 </div>
 
 <div id="installTip"><button id="installClose" aria-label="Kapat">×</button><span id="installText"></span></div>
@@ -192,30 +308,55 @@
 <div id="topbar"><div class="tag"><div class="nm">ATLAS</div><div class="lv" id="bondLv">Bağ Sv. 1</div></div><div class="bank">🐾 <span id="paws">0</span></div></div>
 <div id="bubble">Merhaba!</div>
 <div class="needs left">
-  <div class="need" id="n-yemek"><div class="ico">🍖</div><div class="lbl">Yemek</div><div class="bar"><div class="fill"></div></div></div>
-  <div class="need" id="n-su"><div class="ico">💧</div><div class="lbl">Su</div><div class="bar"><div class="fill"></div></div></div>
-  <div class="need" id="n-enerji"><div class="ico">⚡</div><div class="lbl">Enerji</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-yemek" data-k="yemek"><div class="ring"><span class="ico">🍖</span></div><div class="lbl">Yemek</div></div>
+  <div class="need" id="n-su" data-k="su"><div class="ring"><span class="ico">💧</span></div><div class="lbl">Su</div></div>
+  <div class="need" id="n-enerji" data-k="enerji"><div class="ring"><span class="ico">⚡</span></div><div class="lbl">Enerji</div></div>
 </div>
 <div class="needs right">
-  <div class="need" id="n-oyun"><div class="ico">🎾</div><div class="lbl">Oyun</div><div class="bar"><div class="fill"></div></div></div>
-  <div class="need" id="n-tuvalet"><div class="ico">🌳</div><div class="lbl">Tuvalet</div><div class="bar"><div class="fill"></div></div></div>
-  <div class="need" id="n-sevgi"><div class="ico">💖</div><div class="lbl">Sevgi</div><div class="bar"><div class="fill"></div></div></div>
+  <div class="need" id="n-oyun" data-k="oyun"><div class="ring"><span class="ico">🎾</span></div><div class="lbl">Oyun</div></div>
+  <div class="need" id="n-tuvalet" data-k="tuvalet"><div class="ring"><span class="ico">🌳</span></div><div class="lbl">Tuvalet</div></div>
+  <div class="need" id="n-sevgi" data-k="sevgi"><div class="ring"><span class="ico">💖</span></div><div class="lbl">Sevgi</div></div>
 </div>
 <div id="actions">
-  <button class="act" id="btnYemek"><span class="i">🍖</span><span class="t">Besle</span></button>
-  <button class="act" id="btnSu"><span class="i">💧</span><span class="t">Su Ver</span></button>
-  <button class="act" id="btnOyun"><span class="i">🎮</span><span class="t">Oyun Oyna</span></button>
-  <button class="act" id="btnTuvalet"><span class="i">🌳</span><span class="t">Yürüyüş</span></button>
-  <button class="act" id="btnUyku"><span class="i">💤</span><span class="t">Uyu</span></button>
+  <button class="act" id="btnYemek"><span class="i"><span class="emoji">🍖</span><i class="dot"></i></span><span class="t">Besle</span></button>
+  <button class="act" id="btnSu"><span class="i"><span class="emoji">💧</span><i class="dot"></i></span><span class="t">Su Ver</span></button>
+  <button class="act" id="btnOyun"><span class="i"><span class="emoji">🎮</span><i class="dot"></i></span><span class="t">Oyun Oyna</span></button>
+  <button class="act" id="btnTuvalet"><span class="i"><span class="emoji">🌳</span><i class="dot"></i></span><span class="t">Yürüyüş</span></button>
+  <button class="act" id="btnUyku"><span class="i"><span class="emoji">💤</span><i class="dot"></i></span><span class="t">Uyu</span></button>
 </div>
 <div id="playMenu" aria-hidden="true">
   <button class="toyChoice" data-toy="ball" data-side="left"><span class="toyIcon ballIcon"></span>Top Sol</button>
   <button class="toyChoice" data-toy="ball" data-side="right"><span class="toyIcon ballIcon"></span>Top Sağ</button>
-  <button class="toyChoice" data-toy="plush" data-side="left"><span class="toyIcon plushIcon"></span>Pelüş Sol</button>
-  <button class="toyChoice" data-toy="plush" data-side="right"><span class="toyIcon plushIcon"></span>Pelüş Sağ</button>
+  <button class="toyChoice" data-toy="plush"><span class="toyIcon plushIcon"></span>Peluşu At</button>
 </div>
 <div id="toast"></div>
 
+<div id="walkGame" aria-hidden="true">
+  <div id="wgSky"></div>
+  <div id="wgSun"></div>
+  <div class="wgCloud" id="wgCloud1"></div>
+  <div class="wgCloud" id="wgCloud2"></div>
+  <div id="wgGroundStrip"></div>
+  <div id="wgScene"></div>
+  <div id="wgDogShadow"></div>
+  <div id="wgDog"><img id="wgDogImg" src="yuruyus-yurume1.png" alt=""><div id="wgDogHit"></div></div>
+  <div id="wgHUD">
+    <div id="wgScoreWrap">
+      <div id="wgScore">0 sn</div>
+      <div id="wgBest">En iyi: 0 sn</div>
+    </div>
+    <button id="wgClose" aria-label="Kapat">×</button>
+  </div>
+  <button id="wgJumpBtn" aria-label="Zıpla">⤴</button>
+  <div id="wgEndCard">
+    <div class="card">
+      <div id="wgEndBadge">🏆 Yeni rekor!</div>
+      <h2 id="wgEndTitle">Yürüyüş bitti!</h2>
+      <p id="wgEndText"></p>
+      <button id="wgEndBtn">Tamam</button>
+    </div>
+  </div>
+</div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -227,9 +368,14 @@ const VIDEO_FILES = {
   eat:'mama-yeme.mp4',
   pet:'sevme.mp4',
   run:'kosma.mp4',
-  sleep:'uyuma.mp4'
+  sleep:'uyuma.mp4',
+  hungry:'acikti-bekleme.mp4',
+  thirsty:'susama.mp4',
+  tired:'esneme.mp4',
+  toilet:'tuvalet-arama.mp4',
+  toyplay:'pelus-oynama2.mp4'
 };
-const VIDEO_PRELOAD_ORDER = ['pet','paw','eat','drink','run','play','sleep'];
+const VIDEO_PRELOAD_ORDER = ['pet','paw','eat','drink','run','play','sleep','hungry','thirsty','tired','toilet','toyplay'];
 const SFX_FILE = 'atlas_sfx_pack.mp3';
 const SFX = {
   paw:{src:'sesler/pati hareketi yaparken sesi.mp3',duration:1.15,volume:.28},
@@ -247,26 +393,101 @@ const bank = $('videoBank');
 for (const [key, src] of Object.entries(VIDEO_FILES)) {
   const v = document.createElement('video');
   v.dataset.src = src;
-  v.muted = true; v.loop = true; v.playsInline = true; v.preload = key === 'idle' ? 'auto' : 'none';
-  if (key === 'idle') v.src = src;
+  v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
   bank.appendChild(v); videos[key] = v;
 }
-function ensureVideo(key, eager=false) {
-  const v = videos[key];
-  if (!v) return null;
-  if (!v.src) {
-    v.src = v.dataset.src;
-    v.preload = eager ? 'auto' : 'metadata';
-    v.load();
-  }
-  return v;
+// --- Tam on-yukleme: oyun baslamadan once TUM video+ses dosyalari indirilir, ---
+// --- boylece oynanis sirasinda hicbir klip icin ag/tampon beklemesi olmaz (donma/kasma olmaz). ---
+const loadFill = $('loadBarFill'), loadText = $('loadText'), startBtnEl = $('startBtn');
+const AUDIO_SRCS = [...new Set(Object.values(SFX).map(c => c.src))];
+const ASSET_LIST = [
+  ...Object.entries(VIDEO_FILES).map(([key,src]) => ({type:'video', key, src})),
+  ...AUDIO_SRCS.map(src => ({type:'audio', src}))
+];
+const audioBlobUrls = {};
+function buildSfxPools(){
+  sfxPools = Object.fromEntries(Object.entries(SFX).map(([name,cue]) => [name, {
+    index:0,
+    items:Array.from({length:2}, () => {
+      const a = new Audio(audioBlobUrls[cue.src] || cue.src);
+      a.preload = 'auto';
+      a.playsInline = true;
+      return a;
+    })
+  }]));
 }
-function warmVideosSlowly() {
-  let delay = 120;
-  VIDEO_PRELOAD_ORDER.forEach(key => {
-    setTimeout(() => ensureVideo(key, true), delay);
-    delay += 650;
-  });
+async function preloadAll(){
+  const progressMap = new Map();
+  function recompute(){
+    let loaded=0, total=0;
+    for (const p of progressMap.values()){ loaded+=p.loaded; total+=p.total; }
+    const pct = total ? Math.min(100, Math.round(loaded/total*100)) : 0;
+    if (loadFill) loadFill.style.width = pct+'%';
+    if (loadText) loadText.textContent = 'Yükleniyor… %'+pct;
+    return pct;
+  }
+  let idx = 0;
+  const CONCURRENCY = 4;
+  async function worker(){
+    while (idx < ASSET_LIST.length){
+      const item = ASSET_LIST[idx++];
+      const estTotal = item.type === 'video' ? 3200000 : 60000;
+      progressMap.set(item.src+'|'+item.type, {loaded:0, total:estTotal});
+      try {
+        const res = await fetch(encodeURI(item.src));
+        if (!res.ok) throw new Error('HTTP '+res.status);
+        const len = parseInt(res.headers.get('content-length')||'0',10) || estTotal;
+        progressMap.get(item.src+'|'+item.type).total = len;
+        const reader = res.body.getReader();
+        const chunks = []; let received = 0;
+        for(;;){
+          const {done, value} = await reader.read();
+          if (done) break;
+          chunks.push(value); received += value.length;
+          progressMap.get(item.src+'|'+item.type).loaded = received;
+          recompute();
+        }
+        const mime = item.type === 'video' ? 'video/mp4' : 'audio/mpeg';
+        const blob = new Blob(chunks, {type:mime});
+        if (blob.size === 0) throw new Error('bos dosya alindi');
+        const url = URL.createObjectURL(blob);
+        if (item.type === 'video'){
+          const v = videos[item.key];
+          await new Promise(res2 => {
+            let done = false;
+            const finish = () => { if (done) return; done = true; v.removeEventListener('loadeddata', finish); resolve_(); };
+            function resolve_(){ res2(); }
+            v.addEventListener('loadeddata', finish, {once:true});
+            v.preload = 'auto';
+            v.src = url;
+            v.load();
+            // guvenlik agi: bazi taraytcilarda olay kacabilir, sonsuza dek beklemeyelim
+            setTimeout(finish, 4000);
+          });
+        } else {
+          audioBlobUrls[item.src] = url;
+        }
+      } catch(e){
+        // ag/format hatasinda dogrudan orijinal dosya yoluna dus (eski calisan yontem), ilerlemeyi yine de tamamla say
+        const p = progressMap.get(item.src+'|'+item.type);
+        if (p) p.loaded = p.total;
+        if (item.type === 'video'){
+          const v = videos[item.key];
+          v.preload = 'auto';
+          v.src = item.src;
+          v.load();
+        }
+        recompute();
+      }
+    }
+  }
+  await Promise.all(Array.from({length:CONCURRENCY}, worker));
+  buildSfxPools();
+  recompute();
+  if (startBtnEl){
+    startBtnEl.disabled = false;
+    if (loadText) loadText.textContent = 'Hazır!';
+  }
 }
 
 const cvs = $('dogCanvas'), ctx = cvs.getContext('2d', { willReadFrequently:true });
@@ -277,15 +498,7 @@ const work = document.createElement('canvas'), wctx = work.getContext('2d', { wi
 work.width = cvs.width; work.height = cvs.height;
 let clip = 'idle', facing = 1, started = false, splashAlive = true;
 let sfxReady=false;
-const sfxPools = Object.fromEntries(Object.entries(SFX).map(([name,cue]) => [name, {
-  index:0,
-  items:Array.from({length:2}, () => {
-    const a = new Audio(cue.src);
-    a.preload = 'auto';
-    a.playsInline = true;
-    return a;
-  })
-}]));
+let sfxPools = {};
 
 async function unlockSfx(){
   if (sfxReady) return;
@@ -324,7 +537,7 @@ function setClip(next, face) {
   const prev = videos[clip];
   if (prev) prev.pause();
   clip = next;
-  const v = ensureVideo(clip, true);
+  const v = videos[clip];
   if (v) {
     const playCurrent = () => { if (clip === next) v.play().catch(()=>{}); };
     try { if (v.readyState >= 2) v.currentTime = 0; } catch(e) {}
@@ -383,23 +596,84 @@ function drawDog(targetCtx, targetCanvas) {
   targetCtx.drawImage(work,0,0,targetCanvas.width,targetCanvas.height);
 }
 
-const needs = { yemek:78, su:74, enerji:82, oyun:55, tuvalet:70, sevgi:62 };
+const DEFAULT_NEEDS = { yemek:78, su:74, enerji:82, oyun:55, tuvalet:70, sevgi:62 };
 const DECAY = { yemek:.32, su:.42, enerji:.22, oyun:.5, tuvalet:.38, sevgi:.3 };
+const SAVE_KEY = 'atlas-oyunu-save-v1';
+const needs = Object.assign({}, DEFAULT_NEEDS);
 let paws=0, bondXP=0, bondLevel=1, mood='mutlu', action=null, sleeping=false;
+
+// ---- Kalicilik: ihtiyaclar/pati/bag seviyesi kapatilip acilsa bile korunur. ----
+// Uzakta gecen sure kadar ihtiyaclar da geriye dogru azaltilir (gercekci "seni ozledim" hissi).
+function loadSave(){
+  let raw;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch(e) { return null; }
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object' || !data.needs) return null;
+    return data;
+  } catch(e) { return null; }
+}
+function applySave(data){
+  for (const k in DEFAULT_NEEDS){
+    const v = data.needs[k];
+    needs[k] = (typeof v === 'number' && isFinite(v)) ? v : DEFAULT_NEEDS[k];
+  }
+  paws = (typeof data.paws === 'number' && isFinite(data.paws)) ? data.paws : 0;
+  bondXP = (typeof data.bondXP === 'number' && isFinite(data.bondXP)) ? data.bondXP : 0;
+  bondLevel = (typeof data.bondLevel === 'number' && isFinite(data.bondLevel) && data.bondLevel >= 1) ? data.bondLevel : 1;
+  const savedAt = (typeof data.ts === 'number' && isFinite(data.ts)) ? data.ts : Date.now();
+  const awaySec = Math.max(0, (Date.now() - savedAt) / 1000);
+  const cappedSec = Math.min(awaySec, 24*3600); // 1 gunden fazlasi zaten hepsini 0'a indirir, sinirlamaya gerek yok ama guvenlik icin
+  for (const k in needs) needs[k] = Math.max(0, needs[k] - DECAY[k]*cappedSec);
+  return awaySec;
+}
+function saveState(){
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ needs, paws, bondXP, bondLevel, ts: Date.now() }));
+  } catch(e) { /* localStorage yoksa (gizli sekme vb.) sessizce yoksay */ }
+}
+let welcomeBackMsg = null;
+(function initSave(){
+  const data = loadSave();
+  if (!data) return;
+  const awaySec = applySave(data);
+  if (awaySec > 60*30) {
+    const h = Math.floor(awaySec/3600);
+    welcomeBackMsg = h >= 1 ? `Atlas seni ${h} saattir bekliyordu!` : 'Atlas seni özledi!';
+  }
+})();
+addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
+addEventListener('pagehide', saveState);
+setInterval(saveState, 8000);
 let dogX=0, targetX=0, movingCb=null, t=0, actionTimer=0;
 const dogWrap=$('dogWrap'), shadow=$('dogShadow'), bubble=$('bubble'), toastEl=$('toast');
 const playMenu=$('playMenu'), ballEl=$('ball');
 const installTip=$('installTip'), installText=$('installText'), installClose=$('installClose');
 let installPromptEvent=null;
 const FILLC = v => v>55 ? '#6fd66f' : v>28 ? '#ffc14d' : '#ff6b6b';
+const URGENT_BTN = { yemek:'btnYemek', su:'btnSu', oyun:'btnOyun', tuvalet:'btnTuvalet', enerji:'btnUyku' };
+const lastNeedVal = {};
 function updateHUD(){
-  for (const k in needs){ const el=$('n-'+k), v=Math.round(needs[k]), f=el.querySelector('.fill'); f.style.width=v+'%'; f.style.background=FILLC(v); el.classList.toggle('low',v<28); }
+  for (const k in needs){
+    const el=$('n-'+k), v=Math.round(needs[k]), ring=el.querySelector('.ring');
+    ring.style.setProperty('--p', v);
+    ring.style.setProperty('--c', FILLC(v));
+    el.classList.toggle('low', v<28);
+    if (lastNeedVal[k]!==undefined && Math.abs(lastNeedVal[k]-v) >= 8){
+      el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+      setTimeout(()=>el.classList.remove('bump'), 260);
+    }
+    lastNeedVal[k]=v;
+    const btnId = URGENT_BTN[k];
+    if (btnId){ const btn=$(btnId); if (btn) btn.classList.toggle('urgent', v<28); }
+  }
   $('paws').textContent=paws; $('bondLv').textContent='Bağ Sv. '+bondLevel;
 }
 let toastTimer;
 function toast(m){ toastEl.textContent=m; toastEl.style.opacity=1; clearTimeout(toastTimer); toastTimer=setTimeout(()=>toastEl.style.opacity=0,2200); }
 function fx(ch,x,y,cls='fx'){ const d=document.createElement('div'); d.className=cls; d.textContent=ch; d.style.left=x+'px'; d.style.top=y+'px'; document.body.appendChild(d); setTimeout(()=>d.remove(),1400); }
-function earnPaws(n,x=innerWidth/2-30,y=innerHeight*.4){ paws+=n; bondXP+=n; playSfx('reward'); if(bondXP>=bondLevel*100){bondXP=0; bondLevel++; toast('Bağ seviyesi arttı! Sv.'+bondLevel);} fx('+'+n+' 🐾',x,y,'floatpt'); }
+function earnPaws(n,x=innerWidth/2-30,y=innerHeight*.4){ paws+=n; bondXP+=n; playSfx('reward'); if(bondXP>=bondLevel*100){bondXP=0; bondLevel++; toast('Bağ seviyesi arttı! Sv.'+bondLevel);} fx('+'+n+' 🐾',x,y,'floatpt'); saveState(); }
 function dogScreenPos(){ const r=dogWrap.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height*.25}; }
 const TEXT = {
   mutlu:['Bugün harika!','Seni görünce çok mutlu oldum!','Hav hav!'],
@@ -443,18 +717,21 @@ function hasUrgentNeed(){
 function applyMoodVisual(){
   const m = action || (petting ? 'sevil' : mood);
   if (m==='mutlu') setClip('idle');
-  else if (m==='oyunIstiyor') setClip('paw');
-  else if (m==='acikti' || m==='susadi') setClip('paw');
-  else if (m==='yorgun') setClip('paw');
+  else if (m==='oyunIstiyor') setClip('play');       // oyun isteme.mp4 - once hic tetiklenmiyordu
+  else if (m==='acikti') setClip('hungry');
+  else if (m==='susadi') setClip('thirsty');
+  else if (m==='yorgun') setClip('tired');
   else if (m==='sevil') setClip('pet');
-  else if (m==='tuvaleti') setClip('paw');
+  else if (m==='tuvaleti') setClip('toilet');
   else if (m==='ilgiIstiyor') setClip('paw');
   else if (m==='uyuyor') setClip('sleep');
   else if (m==='ye') setClip('eat');
   else if (m==='ic') setClip('drink');
-  else if (m==='top' || m==='topSevinc') setClip('play');
+  else if (m==='top') setClip('play');
+  else if (m==='topSevinc') setClip(toyKind==='plush' ? 'toyplay' : 'play');
   else if (m==='yuruyus') setClip('idle',1);
-  else if (m==='kosuyor' || m==='topKovala') setClip('run');
+  else if (m==='kosuyor') setClip('run');
+  else if (m==='topKovala') setClip(toyKind==='plush' ? 'play' : 'run');  // pelus beklerken kosu klibi girmesin
 }
 function moveTo(x,cb){ targetX=x; movingCb=cb||null; }
 function updateMove(dt){
@@ -487,12 +764,21 @@ function throwToy(kind='ball', side='right'){
   const toy = TOYS[toyKind] || TOYS.ball;
   const btn = $('btnOyun').getBoundingClientRect();
   const dog = dogWrap.getBoundingClientRect();
-  const dir = toySide === 'left' ? -1 : 1;
   toyStart = {x:btn.left+btn.width/2, y:btn.top+btn.height*.35};
-  const targetX = dir < 0 ? innerWidth*.22 : innerWidth*.78;
-  toyTarget = {x:Math.max(56, Math.min(innerWidth-56, targetX)), y:dog.top+dog.height*(.62+Math.random()*.08)};
+  if (toyKind === 'plush'){
+    // Pelus: dogrudan merkeze atis, kopek yerinden oynamadan yakalasin, kosu klibi araya girmesin.
+    const jitter = (Math.random()-.5)*3;
+    const targetX = innerWidth*.5 + jitter*innerWidth/100;
+    toyTarget = {x:Math.max(56, Math.min(innerWidth-56, targetX)), y:dog.top+dog.height*(.6+Math.random()*.08)};
+    ballX=jitter*.3; ballY=42; ballVX=jitter*.15; ballVY=-20;
+  } else {
+    // Top: eglenceli sol/sag secimi geri geldi - kopek kosarak kovalar.
+    const dir = toySide === 'left' ? -1 : 1;
+    const targetX = dir < 0 ? innerWidth*.22 : innerWidth*.78;
+    toyTarget = {x:Math.max(56, Math.min(innerWidth-56, targetX)), y:dog.top+dog.height*(.62+Math.random()*.08)};
+    ballX=dir*(24+Math.random()*10); ballY=42; ballVX=dir*(8+Math.random()*8); ballVY=-18;
+  }
   action='topKovala'; actionTimer=12; toyThrowT=0;
-  ballX=dir*(24+Math.random()*10); ballY=42; ballVX=dir*(8+Math.random()*8); ballVY=-18;
   ballEl.textContent='';
   ballEl.className='prop toy-'+toyKind;
   ballEl.appendChild(toyImg);
@@ -507,13 +793,228 @@ function throwToy(kind='ball', side='right'){
 }
 function startWalk(){ if(action||sleeping)return; setPlayMenu(false); action='git'; $('tree').classList.add('on'); moveTo(30,()=>{playSfx('toilet'); action='yuruyus'; actionTimer=2.4; setBubble('yuruyus');}); }
 function toggleSleep(){ if(action)return; setPlayMenu(false); sleeping=!sleeping; playSfx(sleeping ? 'sleep' : 'bark'); $('night').style.opacity=sleeping?1:0; $('btnUyku').querySelector('.t').textContent=sleeping?'Uyandır':'Uyu'; if(!sleeping){ lastBubble=''; setBubble(pickMood()); } }
-$('btnYemek').onclick=startEat; $('btnSu').onclick=startDrink; $('btnOyun').onclick=togglePlayMenu; $('btnTuvalet').onclick=startWalk; $('btnUyku').onclick=toggleSleep;
+$('btnYemek').onclick=startEat; $('btnSu').onclick=startDrink; $('btnOyun').onclick=togglePlayMenu; $('btnTuvalet').onclick=openWalkGame; $('btnUyku').onclick=toggleSleep;
 playMenu.querySelectorAll('.toyChoice').forEach(btn=>btn.onclick=()=>throwToy(btn.dataset.toy, btn.dataset.side));
 document.addEventListener('pointerdown', e=>{
   if (!playMenu.classList.contains('on')) return;
   if (playMenu.contains(e.target) || $('btnOyun').contains(e.target)) return;
   setPlayMenu(false);
 });
+
+
+// ================= YURUYUS MINI OYUNU (ARCADE) =================
+const WG_ASSETS = { walk:['yuruyus-yurume1.png','yuruyus-yurume2.png','yuruyus-yurume3.png'], jump:'yuruyus-zipla.png' };
+const WG_OBSTACLES = ['yol-bank.png','yol-cit.png','yol-saksi.png','yol-cop.png'];
+const WG_BONE = 'yol-kemik.png';
+const WG_DOG_X = 15;
+const WG_BEST_KEY = 'atlasWalkBest';
+
+// Ziplama fizigi: birim = #wgDog elementinin kendi yuksekliginin %'si / saniye.
+const WG_GRAVITY = 706;
+const WG_JUMP_V0 = 247;
+const WG_RISE_HOLD_MULT = .5;    // basili tutulursa yukselirken daha az yercekimi -> daha yuksek ziplama
+const WG_RISE_RELEASE_MULT = 1;  // erken birakilirsa yukselirken normal yercekimi -> daha kisa (ama hala engeli asacak kadar yuksek) hoplama
+const WG_FALL_MULT = 1.6;        // inis her zaman daha hizli, oyun hissini keskinlestirir
+const WG_JUMP_BUFFER = .12;      // yere degmeden hemen once basilan ziplama, inince otomatik tetiklenir
+
+let wg = null;
+
+function wgBest(){ return parseInt(localStorage.getItem(WG_BEST_KEY)||'0',10); }
+
+function wgFx(text,xPct,yPct,cls){
+  const d = document.createElement('div');
+  d.className = 'wgFx'+(cls?' '+cls:'');
+  d.style.left = xPct+'%'; d.style.top = yPct+'%';
+  d.textContent = text;
+  $('walkGame').appendChild(d);
+  setTimeout(()=>d.remove(),1150);
+}
+
+function openWalkGame(){
+  if (action || sleeping || wg) return;
+  setPlayMenu(false);
+  wg = {
+    elapsed:0, spawnT:1.2, boneT:3,
+    items:[], over:false, paused:false,
+    cleared:0, bones:0, pendingReward:0,
+    dog:{ y:0, vy:0, jumping:false, holding:false, bufferedUntil:-1, walkT:0, walkFrame:0 },
+    last:performance.now()
+  };
+  $('wgScene').querySelectorAll('.wgObj').forEach(n=>n.remove());
+  $('wgDogImg').src = WG_ASSETS.walk[0];
+  $('wgDog').style.transform = 'translateX(-50%) translateY(0)';
+  $('wgScore').textContent = '0 sn';
+  $('wgBest').textContent = 'En iyi: '+wgBest()+' sn';
+  $('wgEndCard').classList.remove('on');
+  $('wgEndBadge').style.display = 'none';
+  $('walkGame').classList.add('on');
+  requestAnimationFrame(wgTick);
+}
+
+function wgDoJump(){
+  const d = wg.dog;
+  d.jumping = true; d.vy = WG_JUMP_V0;
+  $('wgDogImg').src = WG_ASSETS.jump;
+  playSfx('reward');
+  wgFx('💨', WG_DOG_X-3, 78);
+}
+
+function wgPressJump(){
+  if (!wg || wg.over) return;
+  const d = wg.dog;
+  d.holding = true;
+  if (d.jumping){ d.bufferedUntil = wg.elapsed + WG_JUMP_BUFFER; return; }
+  wgDoJump();
+}
+function wgReleaseJump(){ if (wg) wg.dog.holding = false; }
+
+function wgSpawnObstacle(x){
+  const src = WG_OBSTACLES[Math.floor(Math.random()*WG_OBSTACLES.length)];
+  const el = document.createElement('div');
+  el.className = 'wgObj';
+  el.style.right = x+'%';
+  const img = document.createElement('img');
+  img.src = src; img.alt = '';
+  el.appendChild(img);
+  $('wgScene').appendChild(el);
+  wg.items.push({ el, x, kind:'obstacle', cleared:false });
+}
+function wgSpawnBone(x){
+  const floating = Math.random() < .6;
+  const el = document.createElement('div');
+  el.className = 'wgObj bone '+(floating?'float':'ground');
+  el.style.right = x+'%';
+  const img = document.createElement('img');
+  img.src = WG_BONE; img.alt = '';
+  el.appendChild(img);
+  $('wgScene').appendChild(el);
+  wg.items.push({ el, x, kind:'bone', floating, taken:false });
+}
+
+function wgDifficultyTier(t){ return t<12 ? 0 : t<28 ? 1 : t<50 ? 2 : 3; }
+
+function wgSpawnWave(){
+  const tier = wgDifficultyTier(wg.elapsed);
+  const doubleChance = [0,.22,.4,.5][tier];
+  wgSpawnObstacle(-12);
+  if (Math.random() < doubleChance) wgSpawnObstacle(-12 - (11+Math.random()*3));
+  const base = [1.7,1.35,1.05,.85][tier];
+  wg.spawnT = base + Math.random()*.55;
+}
+
+function wgRectsOverlap(a,b,ainsetX,ainsetY,binsetX,binsetY){
+  const aw=a.width*ainsetX, ah=a.height*ainsetY;
+  const ax0=a.left+aw, ax1=a.right-aw, ay0=a.top+ah, ay1=a.bottom-ah;
+  const bw=b.width*binsetX, bh=b.height*binsetY;
+  const bx0=b.left+bw, bx1=b.right-bw, by0=b.top+bh, by1=b.bottom-bh;
+  return ax0<bx1 && ax1>bx0 && ay0<by1 && ay1>by0;
+}
+
+function wgTick(now){
+  if (!wg) return;
+  requestAnimationFrame(wgTick);
+  const dt = Math.min((now-wg.last)/1000,.05); wg.last = now;
+  if (wg.over || wg.paused) return;
+
+  wg.elapsed += dt;
+  $('wgScore').textContent = Math.floor(wg.elapsed)+' sn';
+  const speed = Math.min(30 + wg.elapsed*.85, 92);
+  const d = wg.dog;
+
+  d.walkT += dt;
+  if (!d.jumping && d.walkT > .13){
+    d.walkT = 0; d.walkFrame = (d.walkFrame+1)%3;
+    $('wgDogImg').src = WG_ASSETS.walk[d.walkFrame];
+  }
+
+  if (d.jumping){
+    const rising = d.vy > 0;
+    const gmult = rising ? (d.holding ? WG_RISE_HOLD_MULT : WG_RISE_RELEASE_MULT) : WG_FALL_MULT;
+    d.vy -= WG_GRAVITY*gmult*dt;
+    d.y += d.vy*dt;
+    if (d.y <= 0){
+      d.y = 0; d.vy = 0; d.jumping = false;
+      $('wgDogImg').src = WG_ASSETS.walk[d.walkFrame];
+      if (wg.elapsed <= d.bufferedUntil){ d.bufferedUntil = -1; wgDoJump(); }
+    }
+    $('wgDog').style.transform = 'translateX(-50%) translateY(-'+d.y+'%)';
+  }
+
+  wg.spawnT -= dt;
+  if (wg.spawnT <= 0) wgSpawnWave();
+  wg.boneT -= dt;
+  if (wg.boneT <= 0){
+    wgSpawnBone(-12 - (wg.items.length ? 8+Math.random()*6 : 0));
+    wg.boneT = 4 + Math.random()*3.2;
+  }
+
+  const dogRect = $('wgDogHit').getBoundingClientRect();
+
+  for (let i=wg.items.length-1;i>=0;i--){
+    const it = wg.items[i];
+    it.x += speed*dt;
+    it.el.style.right = it.x+'%';
+    const r = it.el.getBoundingClientRect();
+
+    if (it.kind==='obstacle'){
+      if (wgRectsOverlap(dogRect,r,.04,.04,.38,.22)){ wgGameOver(); return; }
+      if (!it.cleared && it.x > WG_DOG_X+8){ it.cleared = true; wg.cleared++; }
+    } else if (!it.taken && wgRectsOverlap(dogRect,r,.04,.04,.08,.08)){
+      it.taken = true; wg.bones++;
+      wgFx('+5 🐾', Math.max(0,100-it.x), it.floating?58:78, 'bonefx');
+      it.el.remove(); wg.items.splice(i,1); continue;
+    }
+    if (it.x > 120){ it.el.remove(); wg.items.splice(i,1); }
+  }
+}
+
+function wgGameOver(){
+  if (!wg || wg.over) return;
+  wg.over = true;
+  playSfx('bark');
+  const wgEl = $('walkGame');
+  wgEl.classList.add('shake');
+  setTimeout(()=>wgEl.classList.remove('shake'),340);
+
+  const scoreSec = Math.floor(wg.elapsed);
+  const best = wgBest();
+  const isRecord = scoreSec > best;
+  if (isRecord) localStorage.setItem(WG_BEST_KEY, String(scoreSec));
+
+  wg.pendingReward = 10 + scoreSec + wg.cleared + wg.bones*5;
+  $('wgEndBadge').style.display = isRecord ? 'block' : 'none';
+  $('wgEndTitle').textContent = 'Yürüyüş bitti!';
+  $('wgEndText').textContent = scoreSec+' saniye kaçtın · '+wg.cleared+' engel atladın · '+wg.bones+' kemik topladın';
+  $('wgBest').textContent = 'En iyi: '+Math.max(best,scoreSec)+' sn';
+  $('wgEndCard').classList.add('on');
+}
+
+function wgClose(){
+  const reward = wg ? Math.round(wg.pendingReward||0) : 0;
+  const survived = wg ? wg.elapsed : 0;
+  $('walkGame').classList.remove('on');
+  $('wgScene').querySelectorAll('.wgObj').forEach(n=>n.remove());
+  wg = null;
+  needs.tuvalet = Math.min(100, needs.tuvalet + Math.max(40, survived*3));
+  needs.oyun = Math.min(100, needs.oyun+12);
+  if (reward>0) earnPaws(reward);
+  toast('Eve döndünüz!');
+  saveState();
+}
+
+$('wgJumpBtn').addEventListener('pointerdown', e=>{ e.preventDefault(); wgPressJump(); });
+$('wgScene').addEventListener('pointerdown', e=>{ e.preventDefault(); wgPressJump(); });
+addEventListener('pointerup', wgReleaseJump);
+addEventListener('pointercancel', wgReleaseJump);
+addEventListener('keydown', e=>{
+  if (!wg || wg.over) return;
+  if (e.code==='Space' || e.code==='ArrowUp'){ e.preventDefault(); if (!e.repeat) wgPressJump(); }
+});
+addEventListener('keyup', e=>{ if (e.code==='Space' || e.code==='ArrowUp') wgReleaseJump(); });
+document.addEventListener('visibilitychange', ()=>{ if (wg) wg.paused = document.hidden; });
+
+$('wgClose').onclick = ()=>{ if (wg && !wg.over) wgGameOver(); };
+$('wgEndBtn').onclick = wgClose;
 
 function isStandalone(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -574,7 +1075,6 @@ function petAtPoint(p, force=false){
 function startPettingAt(p, e){
   if(sleeping || (action && action !== 'topSevinc') || !pointInsideDog(p)) return;
   e?.preventDefault?.();
-  ensureVideo('pet', true);
   petting=true;
   petAtPoint(p, true);
 }
@@ -623,7 +1123,7 @@ function tick(now){
       b.style.top=y+'px';
       b.style.bottom='auto';
       b.style.transform=`translate(-50%,-50%) rotate(${p*420-24}deg) scale(${.88+p*.22})`;
-      moveTo(ballX);
+      if (toyKind !== 'plush') moveTo(ballX);
     } else {
       if (toyTarget && toyThrowT - dt < .62) {
         const landed = (toyTarget.x / innerWidth - .5) * 100;
@@ -635,10 +1135,11 @@ function tick(now){
       b.style.top='auto';
       b.style.bottom='calc(16% + '+(-ballY)*.35+'vh)';
       b.style.transform=`translate(-50%,50%) rotate(${t*320}deg) scale(1)`;
-      moveTo(ballX);
+      if (toyKind !== 'plush') moveTo(ballX);
     }
-    actionTimer-=dt; const caught=toyThrowT>.65&&Math.abs(dogX-ballX)<5&&ballY>-8;
-    if(caught||actionTimer<=0){ if(caught){ needs.oyun=Math.min(100,needs.oyun+(toyKind==='plush'?26:32)); needs.enerji=Math.max(0,needs.enerji-(toyKind==='plush'?5:8)); earnPaws(toyKind==='plush'?10:12); toast((TOYS[toyKind]?.label||'Oyuncak')+' yakalandı!'); action='topSevinc'; actionTimer=1.3; setBubble(toyKind==='plush'?'pelus':'top'); fx('✨',dp.x-20,dp.y); fx('✨',dp.x+30,dp.y-20); } else action=null; b.classList.remove('on'); movingCb=null; targetX=dogX; if(!caught)moveTo(0); }
+    actionTimer-=dt; const catchRadius = toyKind==='plush' ? 9 : 5;
+    const caught=toyThrowT>.65&&Math.abs(dogX-ballX)<catchRadius&&ballY>-8;
+    if(caught||actionTimer<=0){ if(caught){ needs.oyun=Math.min(100,needs.oyun+(toyKind==='plush'?26:32)); needs.enerji=Math.max(0,needs.enerji-(toyKind==='plush'?5:8)); earnPaws(toyKind==='plush'?10:12); toast((TOYS[toyKind]?.label||'Oyuncak')+' yakalandı!'); action='topSevinc'; actionTimer=(toyKind==='plush'?4.6:1.3); setBubble(toyKind==='plush'?'pelus':'top'); fx('✨',dp.x-20,dp.y); fx('✨',dp.x+30,dp.y-20); } else action=null; b.classList.remove('on'); movingCb=null; targetX=dogX; if(!caught)moveTo(0); }
   } else if(action==='topSevinc'){ actionTimer-=dt; if(actionTimer<=0){ action=null; moveTo(0); } }
   else if(action==='yuruyus'){ actionTimer-=dt; if(Math.random()<dt*2)fx('✨',innerWidth*.86,innerHeight*.62); if(actionTimer<=0){ action=null; needs.tuvalet=100; earnPaws(10); toast('Rahatladı!'); setTimeout(()=>$('tree').classList.remove('on'),700); moveTo(0); } }
   const isMoving=updateMove(dt);
@@ -652,19 +1153,18 @@ function tick(now){
   hudTimer-=dt; if(hudTimer<=0){hudTimer=.25; updateHUD();}
 }
 $('startBtn').onclick=async()=>{
+  if (startBtnEl.disabled) return;
   started=true;
   action=null; movingCb=null; dogX=0; targetX=0; facing=1;
   stopAllVideos();
-  clip='idle';
-  const firstVideo = ensureVideo(clip, true);
-  try { firstVideo.load(); } catch(e) {}
+  const firstVideo = videos.idle;
   const firstPlay = firstVideo.play().catch(()=>{});
   await unlockSfx();
   await firstPlay;
-  warmVideosSlowly();
-  const s=$('splash'); s.style.opacity=0; setTimeout(()=>{ splashAlive=false; s.remove(); },650); setBubble('mutlu');
+  const s=$('splash'); s.style.opacity=0; setTimeout(()=>{ splashAlive=false; s.remove(); },650);
+  if (welcomeBackMsg){ setBubble('mutlu'); toast(welcomeBackMsg); } else setBubble('mutlu');
 };
-ensureVideo('idle', true); ensureVideo('pet', true); setClip('idle'); updateHUD(); requestAnimationFrame(tick);
+setClip('idle'); updateHUD(); requestAnimationFrame(tick); preloadAll();
 </script>
 </body>
 </html>
